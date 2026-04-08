@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grand Azure Hotel — Miami Beachfront</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+/* ═══════════════════════════════════════════════
+   RESET & BASE
+═══════════════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --gold:#C9A96E;--gold2:#E8C98A;--dark:#0A0D14;--dark2:#111420;
+  --navy:#0D1B2A;--sky:#0EA5E9;--sky2:#0284C7;
+  --text:#F5F3EE;--muted:#9BA3AF;--white:#FFFFFF;
+  --r:12px;
+}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--dark);color:var(--text);overflow-x:hidden}
+h1,h2,h3,h4,.serif{font-family:'Cormorant Garamond',serif}
+a{text-decoration:none;color:inherit}
+img{display:block;max-width:100%}
+
+/* ═══════════════════════════════════════════════
+   NAVBAR
+═══════════════════════════════════════════════ */
+.nav{
+  position:fixed;top:0;left:0;right:0;z-index:500;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 48px;height:72px;
+  transition:background .4s,backdrop-filter .4s,border-color .4s;
+}
+.nav.scrolled{
+  background:rgba(10,13,20,.92);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid rgba(201,169,110,.15);
+}
+.nav-logo{display:flex;flex-direction:column;line-height:1}
+.nav-logo span:first-child{font-family:'Cormorant Garamond',serif;font-size:1.35rem;font-weight:600;letter-spacing:2px;color:var(--gold)}
+.nav-logo span:last-child{font-size:.58rem;letter-spacing:4px;text-transform:uppercase;color:var(--muted);margin-top:2px}
+.nav-links{display:flex;gap:36px;font-size:.8rem;letter-spacing:1.5px;text-transform:uppercase}
+.nav-links a{color:rgba(255,255,255,.7);transition:color .2s}
+.nav-links a:hover{color:var(--gold)}
+.nav-book{background:var(--gold);color:var(--dark);padding:9px 22px;border-radius:4px;font-size:.75rem;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;border:none;cursor:pointer;transition:background .2s}
+.nav-book:hover{background:var(--gold2)}
+
+/* ═══════════════════════════════════════════════
+   HERO
+═══════════════════════════════════════════════ */
+.hero{
+  position:relative;height:100vh;min-height:640px;
+  display:flex;align-items:center;justify-content:center;text-align:center;
+  overflow:hidden;
+}
+.hero-bg{
+  position:absolute;inset:0;z-index:0;
+  background:
+    linear-gradient(180deg, rgba(10,13,20,0) 0%, rgba(10,13,20,.5) 60%, rgba(10,13,20,1) 100%),
+    linear-gradient(135deg, #0D1B2A 0%, #0A2240 30%, #0A3560 55%, #0D4F7C 70%, #0E6FA8 85%, #0EA5E9 100%);
+}
+/* Fake sky + ocean layers */
+.hero-bg::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 80% 50% at 50% 30%, rgba(14,165,233,.18) 0%, transparent 70%),
+             radial-gradient(ellipse 60% 40% at 80% 60%, rgba(201,169,110,.08) 0%, transparent 60%);
+}
+/* Decorative wave lines */
+.hero-bg::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:200px;
+  background:linear-gradient(180deg,transparent 0%,rgba(10,13,20,.8) 60%,var(--dark) 100%);
+}
+/* Animated particles */
+.particle{position:absolute;border-radius:50%;background:rgba(201,169,110,.3);animation:float linear infinite}
+@keyframes float{0%{transform:translateY(0) translateX(0);opacity:0}10%{opacity:1}90%{opacity:.3}100%{transform:translateY(-100vh) translateX(40px);opacity:0}}
+
+.hero-content{position:relative;z-index:1;padding:0 24px}
+.hero-eyebrow{font-size:.68rem;letter-spacing:5px;text-transform:uppercase;color:var(--gold);margin-bottom:18px}
+.hero-title{font-size:clamp(3rem,7vw,6.5rem);font-weight:300;line-height:1.05;letter-spacing:-1px;margin-bottom:12px}
+.hero-title em{font-style:italic;color:var(--gold2)}
+.hero-sub{font-size:1rem;color:rgba(255,255,255,.6);max-width:500px;margin:0 auto 40px;line-height:1.7;font-weight:300}
+.hero-btns{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+.btn-gold{background:var(--gold);color:var(--dark);padding:14px 34px;border-radius:4px;font-size:.78rem;font-weight:600;letter-spacing:2px;text-transform:uppercase;border:none;cursor:pointer;transition:all .2s}
+.btn-gold:hover{background:var(--gold2);transform:translateY(-1px)}
+.btn-outline{background:transparent;color:var(--text);padding:14px 34px;border-radius:4px;font-size:.78rem;font-weight:500;letter-spacing:2px;text-transform:uppercase;border:1px solid rgba(255,255,255,.3);cursor:pointer;transition:all .2s}
+.btn-outline:hover{border-color:var(--gold);color:var(--gold)}
+
+/* Scroll indicator */
+.scroll-hint{position:absolute;bottom:36px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;color:rgba(255,255,255,.4);font-size:.65rem;letter-spacing:3px;text-transform:uppercase;z-index:1}
+.scroll-line{width:1px;height:50px;background:linear-gradient(var(--gold),transparent);animation:scrollDown 1.8s ease infinite}
+@keyframes scrollDown{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform:scaleY(1);transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+
+/* ═══════════════════════════════════════════════
+   STATS BAR
+═══════════════════════════════════════════════ */
+.stats-bar{
+  background:rgba(201,169,110,.07);
+  border-top:1px solid rgba(201,169,110,.12);
+  border-bottom:1px solid rgba(201,169,110,.12);
+  padding:28px 48px;
+  display:flex;justify-content:center;gap:80px;flex-wrap:wrap;
+}
+.stat{text-align:center}
+.stat-val{font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:300;color:var(--gold);line-height:1}
+.stat-lbl{font-size:.68rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-top:4px}
+
+/* ═══════════════════════════════════════════════
+   SECTION BASE
+═══════════════════════════════════════════════ */
+.section{padding:100px 48px;max-width:1200px;margin:0 auto}
+.sec-eyebrow{font-size:.65rem;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:14px}
+.sec-title{font-size:clamp(2rem,4vw,3.2rem);font-weight:300;letter-spacing:-0.5px;line-height:1.15;margin-bottom:16px}
+.sec-sub{color:var(--muted);font-size:.9rem;line-height:1.8;max-width:500px;font-weight:300}
+.divider{width:60px;height:1px;background:var(--gold);margin:24px 0}
+
+/* ═══════════════════════════════════════════════
+   ROOMS
+═══════════════════════════════════════════════ */
+#rooms{background:var(--dark)}
+.rooms-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:2px;margin-top:60px;border-radius:16px;overflow:hidden}
+.room-card{position:relative;overflow:hidden;cursor:pointer}
+.room-img{
+  height:320px;
+  transition:transform .6s ease;
+}
+.room-card:hover .room-img{transform:scale(1.05)}
+.room-img.r1{background:linear-gradient(160deg,#1a3a5c 0%,#0d2540 40%,#071828 100%)}
+.room-img.r2{background:linear-gradient(160deg,#1e2d45 0%,#162035 50%,#0a1520 100%)}
+.room-img.r3{background:linear-gradient(160deg,#2a1f40 0%,#1a1430 50%,#0d0a1f 100%)}
+.room-img.r4{background:linear-gradient(160deg,#1f3040 0%,#162535 50%,#0a1820 100%)}
+/* Room mockup interior */
+.room-img::before{
+  content:'';position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 70% 40% at 50% 30%,rgba(255,220,130,.06) 0%,transparent 60%),
+    radial-gradient(ellipse 50% 60% at 80% 70%,rgba(14,165,233,.05) 0%,transparent 50%);
+}
+.room-img::after{
+  content:'🛏';font-size:3.5rem;position:absolute;
+  top:50%;left:50%;transform:translate(-50%,-60%);opacity:.15;
+}
+.room-overlay{
+  position:absolute;inset:0;padding:24px;
+  display:flex;flex-direction:column;justify-content:flex-end;
+  background:linear-gradient(transparent 30%,rgba(10,13,20,.95) 100%);
+}
+.room-tag{font-size:.62rem;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:6px}
+.room-name{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:400;margin-bottom:4px}
+.room-price{font-size:.8rem;color:rgba(255,255,255,.5)}
+.room-price strong{color:var(--gold2);font-size:.95rem}
+
+/* ═══════════════════════════════════════════════
+   AMENITIES
+═══════════════════════════════════════════════ */
+#amenities{background:var(--dark2)}
+.amen-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:28px;margin-top:56px}
+.amen-card{
+  background:rgba(255,255,255,.03);
+  border:1px solid rgba(201,169,110,.1);
+  border-radius:12px;padding:28px 22px;
+  text-align:center;
+  transition:all .3s;
+}
+.amen-card:hover{background:rgba(201,169,110,.06);border-color:rgba(201,169,110,.25);transform:translateY(-4px)}
+.amen-icon{font-size:2rem;margin-bottom:14px}
+.amen-name{font-family:'Cormorant Garamond',serif;font-size:1.1rem;margin-bottom:6px}
+.amen-desc{font-size:.78rem;color:var(--muted);line-height:1.6}
+
+/* ═══════════════════════════════════════════════
+   EXPERIENCE / GALLERY SECTION
+═══════════════════════════════════════════════ */
+#experience{background:var(--dark)}
+.exp-layout{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;margin-top:60px}
+@media(max-width:768px){.exp-layout{grid-template-columns:1fr}}
+.exp-visual{
+  height:480px;border-radius:16px;position:relative;overflow:hidden;
+  background:linear-gradient(135deg,#0d2540 0%,#0a3a60 50%,#0e6fa8 100%);
+}
+.exp-visual::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 80% 60% at 50% 40%,rgba(14,165,233,.2) 0%,transparent 70%);
+}
+.exp-visual-label{
+  position:absolute;bottom:0;left:0;right:0;
+  padding:28px;
+  background:linear-gradient(transparent,rgba(10,13,20,.9));
+  font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:300;
+}
+.exp-badge{
+  position:absolute;top:20px;right:20px;
+  background:rgba(201,169,110,.15);
+  border:1px solid rgba(201,169,110,.3);
+  border-radius:8px;padding:12px 16px;text-align:center;
+}
+.exp-badge-num{font-family:'Cormorant Garamond',serif;font-size:2rem;color:var(--gold);line-height:1}
+.exp-badge-txt{font-size:.6rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
+.exp-features{display:flex;flex-direction:column;gap:22px}
+.exp-feat{display:flex;gap:16px;align-items:flex-start;padding:20px;border-radius:10px;transition:background .2s}
+.exp-feat:hover{background:rgba(255,255,255,.03)}
+.exp-feat-icon{width:44px;height:44px;border-radius:10px;background:rgba(201,169,110,.1);border:1px solid rgba(201,169,110,.2);display:grid;place-items:center;font-size:1.1rem;flex-shrink:0}
+.exp-feat h4{font-family:'Cormorant Garamond',serif;font-size:1.1rem;margin-bottom:4px}
+.exp-feat p{font-size:.8rem;color:var(--muted);line-height:1.6}
+
+/* ═══════════════════════════════════════════════
+   TESTIMONIALS
+═══════════════════════════════════════════════ */
+#reviews{background:var(--dark2);padding:100px 48px}
+.reviews-inner{max-width:1200px;margin:0 auto}
+.reviews-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px;margin-top:56px}
+.review-card{
+  background:rgba(255,255,255,.03);
+  border:1px solid rgba(255,255,255,.06);
+  border-radius:14px;padding:28px;
+  transition:border-color .2s;
+}
+.review-card:hover{border-color:rgba(201,169,110,.2)}
+.stars{color:var(--gold);font-size:.85rem;margin-bottom:14px;letter-spacing:2px}
+.review-text{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:300;font-style:italic;line-height:1.7;color:rgba(255,255,255,.85);margin-bottom:18px}
+.reviewer{display:flex;align-items:center;gap:12px}
+.reviewer-avatar{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-size:.85rem;background:rgba(201,169,110,.12);border:1px solid rgba(201,169,110,.2)}
+.reviewer-name{font-size:.82rem;font-weight:600}
+.reviewer-loc{font-size:.72rem;color:var(--muted)}
+
+/* ═══════════════════════════════════════════════
+   CTA BANNER
+═══════════════════════════════════════════════ */
+.cta-banner{
+  padding:100px 48px;text-align:center;
+  background:linear-gradient(135deg,rgba(14,165,233,.08) 0%,rgba(201,169,110,.06) 100%);
+  border-top:1px solid rgba(201,169,110,.1);
+  border-bottom:1px solid rgba(201,169,110,.1);
+}
+.cta-banner h2{font-size:clamp(2rem,4vw,3rem);font-weight:300;margin-bottom:12px}
+.cta-banner p{color:var(--muted);font-size:.9rem;max-width:480px;margin:0 auto 36px;line-height:1.8}
+
+/* ═══════════════════════════════════════════════
+   FOOTER
+═══════════════════════════════════════════════ */
+footer{background:var(--dark2);padding:60px 48px 30px;border-top:1px solid rgba(255,255,255,.05)}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;max-width:1200px;margin:0 auto 48px}
+@media(max-width:768px){.footer-grid{grid-template-columns:1fr 1fr}}
+.footer-brand span:first-child{font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:var(--gold);display:block;margin-bottom:4px;letter-spacing:2px}
+.footer-brand p{color:var(--muted);font-size:.8rem;line-height:1.7;margin-top:12px;max-width:260px}
+.footer-col h5{font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:16px}
+.footer-col ul{list-style:none;display:flex;flex-direction:column;gap:10px}
+.footer-col ul li a{font-size:.8rem;color:var(--muted);transition:color .2s}
+.footer-col ul li a:hover{color:var(--text)}
+.footer-bottom{max-width:1200px;margin:0 auto;padding-top:24px;border-top:1px solid rgba(255,255,255,.05);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.footer-bottom p{font-size:.72rem;color:var(--muted)}
+
+/* ═══════════════════════════════════════════════
+   CHATBOT WIDGET
+═══════════════════════════════════════════════ */
+#chat-bubble{
+  position:fixed;bottom:28px;right:28px;z-index:999;
+  width:58px;height:58px;border-radius:50%;
+  background:linear-gradient(135deg,var(--sky) 0%,var(--sky2) 100%);
+  border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 8px 32px rgba(14,165,233,.45);
+  transition:transform .2s,box-shadow .2s;
+  animation:bubblePop .5s cubic-bezier(.34,1.56,.64,1) both;
+  animation-delay:.8s;
+  transform:scale(0);
+}
+@keyframes bubblePop{to{transform:scale(1)}}
+#chat-bubble:hover{transform:scale(1.1);box-shadow:0 12px 40px rgba(14,165,233,.55)}
+#chat-bubble svg{width:24px;height:24px;transition:opacity .2s,transform .2s}
+#chat-bubble .icon-close{position:absolute;opacity:0;transform:rotate(-90deg) scale(.5)}
+#chat-bubble.open .icon-chat{opacity:0;transform:rotate(90deg) scale(.5)}
+#chat-bubble.open .icon-close{opacity:1;transform:rotate(0) scale(1)}
+
+/* Notif badge */
+#chat-badge{
+  position:absolute;top:-3px;right:-3px;
+  width:20px;height:20px;border-radius:50%;
+  background:#EF4444;color:white;
+  font-size:.65rem;font-weight:700;
+  display:grid;place-items:center;
+  border:2px solid var(--dark);
+  animation:badgePop .3s cubic-bezier(.34,1.56,.64,1) both;
+  animation-delay:2s;
+  transform:scale(0);
+}
+@keyframes badgePop{to{transform:scale(1)}}
+
+/* Chat panel */
+#chat-panel{
+  position:fixed;bottom:100px;right:28px;z-index:998;
+  width:380px;height:560px;
+  background:#0F1219;
+  border:1px solid rgba(14,165,233,.2);
+  border-radius:20px;
+  display:flex;flex-direction:column;
+  box-shadow:0 24px 80px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.04);
+  overflow:hidden;
+  transform:scale(.92) translateY(20px);
+  opacity:0;
+  pointer-events:none;
+  transition:transform .3s cubic-bezier(.34,1.2,.64,1),opacity .25s ease;
+  transform-origin:bottom right;
+}
+#chat-panel.open{transform:scale(1) translateY(0);opacity:1;pointer-events:all}
+
+/* Panel header */
+.cp-header{
+  background:linear-gradient(135deg,#0c2a45 0%,#0d3a60 100%);
+  padding:18px 20px;
+  display:flex;align-items:center;gap:13px;
+  border-bottom:1px solid rgba(14,165,233,.15);
+  flex-shrink:0;
+}
+.cp-avatar{
+  width:42px;height:42px;border-radius:50%;
+  background:linear-gradient(135deg,var(--sky),var(--sky2));
+  display:grid;place-items:center;font-size:1.1rem;flex-shrink:0;
+}
+.cp-info h3{font-size:.9rem;font-weight:600;color:var(--white)}
+.cp-info p{font-size:.7rem;color:rgba(255,255,255,.55);margin-top:1px}
+.cp-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#10B981;margin-right:5px;box-shadow:0 0 6px #10B981}
+.cp-minimize{margin-left:auto;background:none;border:none;color:rgba(255,255,255,.4);cursor:pointer;padding:4px;border-radius:6px;transition:color .2s;font-size:1.1rem;line-height:1}
+.cp-minimize:hover{color:var(--white)}
+
+/* Messages */
+.cp-messages{
+  flex:1;overflow-y:auto;padding:16px 14px;
+  display:flex;flex-direction:column;gap:10px;
+  scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.1) transparent;
+}
+.cp-messages::-webkit-scrollbar{width:3px}
+.cp-messages::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px}
+
+.cp-msg{display:flex;gap:8px;max-width:88%;animation:msgIn .25s ease both}
+@keyframes msgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.cp-msg.bot{align-self:flex-start}
+.cp-msg.user{align-self:flex-end;flex-direction:row-reverse}
+.cp-msg-av{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:.7rem;flex-shrink:0;margin-top:2px}
+.cp-msg.bot  .cp-msg-av{background:linear-gradient(135deg,var(--sky),var(--sky2))}
+.cp-msg.user .cp-msg-av{background:rgba(255,255,255,.08)}
+.cp-bubble{padding:9px 13px;border-radius:14px;font-size:.82rem;line-height:1.55;word-break:break-word}
+.cp-msg.bot  .cp-bubble{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.06);border-radius:4px 14px 14px 14px}
+.cp-msg.user .cp-bubble{background:linear-gradient(135deg,var(--sky),var(--sky2));color:white;border-radius:14px 4px 14px 14px}
+.cp-time{font-size:.6rem;color:rgba(255,255,255,.25);margin-top:3px;padding:0 2px}
+.cp-msg.user .cp-time{text-align:right}
+
+/* Typing */
+.typing-dots{display:flex;gap:4px;padding:10px 13px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.06);border-radius:4px 14px 14px 14px;width:fit-content}
+.typing-dots span{width:5px;height:5px;background:rgba(255,255,255,.35);border-radius:50%;animation:td .9s infinite}
+.typing-dots span:nth-child(2){animation-delay:.15s}
+.typing-dots span:nth-child(3){animation-delay:.3s}
+@keyframes td{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
+
+/* Quick replies */
+.cp-qr{display:flex;flex-wrap:wrap;gap:6px;padding:6px 14px 2px}
+.cp-qr-btn{
+  background:transparent;border:1px solid rgba(14,165,233,.3);
+  color:rgba(14,165,233,.9);padding:5px 12px;border-radius:100px;
+  font-size:.73rem;cursor:pointer;font-family:'DM Sans',sans-serif;
+  transition:all .2s;white-space:nowrap;
+}
+.cp-qr-btn:hover{background:rgba(14,165,233,.1);border-color:var(--sky)}
+
+/* Input */
+.cp-input-area{
+  padding:12px 14px 16px;flex-shrink:0;
+  border-top:1px solid rgba(255,255,255,.05);
+  background:rgba(0,0,0,.2);
+}
+.cp-input-row{display:flex;gap:8px;align-items:flex-end}
+.cp-input-wrap{
+  flex:1;background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:12px;display:flex;align-items:flex-end;
+  padding:6px 8px 6px 12px;
+  transition:border-color .2s;
+}
+.cp-input-wrap:focus-within{border-color:rgba(14,165,233,.4)}
+.cp-textarea{
+  flex:1;background:none;border:none;outline:none;
+  color:var(--text);font-family:'DM Sans',sans-serif;
+  font-size:.82rem;resize:none;max-height:80px;
+  line-height:1.5;padding:3px 0;
+}
+.cp-textarea::placeholder{color:rgba(255,255,255,.2)}
+.cp-send{
+  width:36px;height:36px;border-radius:9px;
+  background:linear-gradient(135deg,var(--sky),var(--sky2));
+  border:none;color:white;cursor:pointer;
+  display:grid;place-items:center;flex-shrink:0;
+  transition:all .2s;
+}
+.cp-send:hover{transform:scale(1.05)}
+.cp-send:disabled{opacity:.35;cursor:not-allowed;transform:none}
+.cp-send svg{width:14px;height:14px}
+
+/* Powered by */
+.cp-powered{text-align:center;padding:6px 0 2px;font-size:.62rem;color:rgba(255,255,255,.18);letter-spacing:.5px}
+.cp-powered a{color:rgba(14,165,233,.5)}
+
+@media(max-width:440px){
+  #chat-panel{width:calc(100vw - 20px);right:10px;bottom:90px;height:72vh}
+  #chat-bubble{right:16px;bottom:16px}
+}
+</style>
+</head>
+<body>
+
+<!-- ═════════════════════════════ NAVBAR ══════════════════════════════ -->
+<nav class="nav" id="navbar">
+  <div class="nav-logo">
+    <span>GRAND AZURE</span>
+    <span>Miami Beachfront Hotel</span>
+  </div>
+  <div class="nav-links">
+    <a href="#rooms">Rooms</a>
+    <a href="#amenities">Amenities</a>
+    <a href="#experience">Experience</a>
+    <a href="#reviews">Reviews</a>
+  </div>
+  <button class="nav-book" onclick="document.getElementById('chat-bubble').click()">
+    Book Now
+  </button>
+</nav>
+
+<!-- ═════════════════════════════ HERO ════════════════════════════════ -->
+<section class="hero">
+  <div class="hero-bg">
+    <!-- particles -->
+    <div class="particle" style="width:3px;height:3px;left:15%;animation-duration:12s;animation-delay:0s"></div>
+    <div class="particle" style="width:2px;height:2px;left:30%;animation-duration:9s;animation-delay:2s"></div>
+    <div class="particle" style="width:4px;height:4px;left:55%;animation-duration:15s;animation-delay:1s"></div>
+    <div class="particle" style="width:2px;height:2px;left:70%;animation-duration:11s;animation-delay:3s"></div>
+    <div class="particle" style="width:3px;height:3px;left:85%;animation-duration:13s;animation-delay:0.5s"></div>
+  </div>
+  <div class="hero-content">
+    <p class="hero-eyebrow">★ Miami's #1 Beachfront Luxury Hotel</p>
+    <h1 class="hero-title">
+      Where the Ocean<br>Meets <em>Elegance</em>
+    </h1>
+    <p class="hero-sub">An unparalleled luxury experience on Miami's most exclusive beachfront. Wake up to breathtaking ocean views every morning.</p>
+    <div class="hero-btns">
+      <button class="btn-gold" onclick="document.getElementById('chat-bubble').click()">Reserve Your Suite</button>
+      <button class="btn-outline" onclick="document.getElementById('rooms').scrollIntoView({behavior:'smooth'})">Explore Rooms</button>
+    </div>
+  </div>
+  <div class="scroll-hint">
+    <div class="scroll-line"></div>
+    <span>Scroll</span>
+  </div>
+</section>
+
+<!-- ═════════════════════════════ STATS BAR ═══════════════════════════ -->
+<div class="stats-bar">
+  <div class="stat"><div class="stat-val">248</div><div class="stat-lbl">Luxury Rooms</div></div>
+  <div class="stat"><div class="stat-val">4.9★</div><div class="stat-lbl">Guest Rating</div></div>
+  <div class="stat"><div class="stat-val">15+</div><div class="stat-lbl">Years of Excellence</div></div>
+  <div class="stat"><div class="stat-val">24/7</div><div class="stat-lbl">Concierge Service</div></div>
+</div>
+
+<!-- ═════════════════════════════ ROOMS ═══════════════════════════════ -->
+<section id="rooms">
+  <div class="section">
+    <p class="sec-eyebrow">Accommodations</p>
+    <h2 class="sec-title">Rooms & Suites</h2>
+    <div class="divider"></div>
+    <p class="sec-sub">Each room is a sanctuary of comfort, designed to provide the finest luxury experience with breathtaking ocean views.</p>
+  </div>
+  <div class="rooms-grid" style="max-width:1296px;margin:0 auto">
+    <div class="room-card">
+      <div class="room-img r1"></div>
+      <div class="room-overlay">
+        <span class="room-tag">Most Popular</span>
+        <div class="room-name">Deluxe Ocean Room</div>
+        <div class="room-price">From <strong>$185</strong> / night</div>
+      </div>
+    </div>
+    <div class="room-card">
+      <div class="room-img r2"></div>
+      <div class="room-overlay">
+        <span class="room-tag">Best Value</span>
+        <div class="room-name">Standard Room</div>
+        <div class="room-price">From <strong>$120</strong> / night</div>
+      </div>
+    </div>
+    <div class="room-card">
+      <div class="room-img r3"></div>
+      <div class="room-overlay">
+        <span class="room-tag">Recommended</span>
+        <div class="room-name">Junior Suite</div>
+        <div class="room-price">From <strong>$260</strong> / night</div>
+      </div>
+    </div>
+    <div class="room-card">
+      <div class="room-img r4"></div>
+      <div class="room-overlay">
+        <span class="room-tag">Exclusive</span>
+        <div class="room-name">Presidential Suite</div>
+        <div class="room-price">From <strong>$550</strong> / night</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════════════════════════ AMENITIES ═══════════════════════════ -->
+<section id="amenities" style="background:var(--dark2);padding:100px 0">
+  <div class="section">
+    <p class="sec-eyebrow">Hotel Amenities</p>
+    <h2 class="sec-title">Everything You Need</h2>
+    <div class="divider"></div>
+    <p class="sec-sub">World-class facilities designed to make your stay truly unforgettable.</p>
+    <div class="amen-grid">
+      <div class="amen-card"><div class="amen-icon">🏊</div><div class="amen-name">Rooftop Pool</div><div class="amen-desc">Infinity pool with panoramic ocean views. Open 7 AM–10 PM</div></div>
+      <div class="amen-card"><div class="amen-icon">💆</div><div class="amen-name">Luxury Spa</div><div class="amen-desc">Full-service spa with massages, facials & body treatments</div></div>
+      <div class="amen-card"><div class="amen-icon">🍽️</div><div class="amen-name">Fine Dining</div><div class="amen-desc">Azure Restaurant & Sky Bar serving fresh Mediterranean cuisine</div></div>
+      <div class="amen-card"><div class="amen-icon">🏋️</div><div class="amen-name">Fitness Center</div><div class="amen-desc">State-of-the-art gym open 24 hours for all guests</div></div>
+      <div class="amen-card"><div class="amen-icon">🚗</div><div class="amen-name">Valet Parking</div><div class="amen-desc">Secure underground parking with valet service</div></div>
+      <div class="amen-card"><div class="amen-icon">📶</div><div class="amen-name">Free Wi-Fi</div><div class="amen-desc">High-speed 200 Mbps Wi-Fi throughout the entire hotel</div></div>
+      <div class="amen-card"><div class="amen-icon">🚐</div><div class="amen-name">Airport Transfer</div><div class="amen-desc">Private luxury transfers to/from Miami International Airport</div></div>
+      <div class="amen-card"><div class="amen-icon">🐾</div><div class="amen-name">Pet Friendly</div><div class="amen-desc">We welcome pets! Special pet amenity kit included</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════════════════════════ EXPERIENCE ══════════════════════════ -->
+<section id="experience">
+  <div class="section">
+    <p class="sec-eyebrow">The Azure Experience</p>
+    <h2 class="sec-title">More Than a Stay</h2>
+    <div class="divider"></div>
+    <div class="exp-layout">
+      <div class="exp-visual">
+        <div class="exp-badge">
+          <div class="exp-badge-num">⭐ 4.9</div>
+          <div class="exp-badge-txt">Guest Score</div>
+        </div>
+        <div class="exp-visual-label">Rooftop Infinity Pool — 18th Floor</div>
+      </div>
+      <div class="exp-features">
+        <div class="exp-feat">
+          <div class="exp-feat-icon">🌅</div>
+          <div><h4>Ocean-View Rooms</h4><p>Wake up to stunning sunrise views over the Atlantic Ocean from your private balcony.</p></div>
+        </div>
+        <div class="exp-feat">
+          <div class="exp-feat-icon">🛎️</div>
+          <div><h4>24/7 Butler Service</h4><p>Our dedicated concierge team is available around the clock to fulfill every request.</p></div>
+        </div>
+        <div class="exp-feat">
+          <div class="exp-feat-icon">🍾</div>
+          <div><h4>Curated Experiences</h4><p>Private yacht charters, beachside dinners, and exclusive Miami city tours arranged on request.</p></div>
+        </div>
+        <div class="exp-feat">
+          <div class="exp-feat-icon">🌟</div>
+          <div><h4>Azure Rewards</h4><p>Earn points on every stay. Silver, Gold, and Platinum tiers with exclusive perks and free nights.</p></div>
+        </div>
+        <div style="margin-top:8px">
+          <button class="btn-gold" onclick="document.getElementById('chat-bubble').click()">Talk to Our Concierge →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════════════════════════ REVIEWS ═════════════════════════════ -->
+<section id="reviews">
+  <div class="reviews-inner">
+    <p class="sec-eyebrow">Guest Reviews</p>
+    <h2 class="sec-title">What Our Guests Say</h2>
+    <div class="divider"></div>
+    <div class="reviews-grid">
+      <div class="review-card">
+        <div class="stars">★★★★★</div>
+        <p class="review-text">"Absolutely stunning hotel. The rooftop pool view at sunset was breathtaking. Staff went above and beyond every single moment."</p>
+        <div class="reviewer"><div class="reviewer-avatar">👩</div><div><div class="reviewer-name">Sarah M.</div><div class="reviewer-loc">New York, USA</div></div></div>
+      </div>
+      <div class="review-card">
+        <div class="stars">★★★★★</div>
+        <p class="review-text">"The Presidential Suite exceeded all expectations. The AI chatbot helped me plan my entire itinerary before I even arrived — impressive!"</p>
+        <div class="reviewer"><div class="reviewer-avatar">👨</div><div><div class="reviewer-name">James T.</div><div class="reviewer-loc">London, UK</div></div></div>
+      </div>
+      <div class="review-card">
+        <div class="stars">★★★★★</div>
+        <p class="review-text">"Best hotel experience I've ever had. The spa is world-class and the restaurant serves the most amazing Mediterranean food. Will return!"</p>
+        <div class="reviewer"><div class="reviewer-avatar">👩</div><div><div class="reviewer-name">Aisha K.</div><div class="reviewer-loc">Dubai, UAE</div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════════════════════════ CTA ══════════════════════════════════ -->
+<div class="cta-banner">
+  <h2 class="serif">Ready to Experience Grand Azure?</h2>
+  <p>Book your stay today and let our AI concierge help you plan the perfect getaway.</p>
+  <button class="btn-gold" onclick="document.getElementById('chat-bubble').click()">Chat With Our Concierge</button>
+</div>
+
+<!-- ═════════════════════════════ FOOTER ══════════════════════════════ -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <span>GRAND AZURE HOTEL</span>
+      <span style="font-size:.58rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted)">Miami Beachfront</span>
+      <p>123 Azure Boulevard, Oceanfront District, Miami, FL 33101. A landmark of luxury on Miami's most exclusive beachfront.</p>
+    </div>
+    <div class="footer-col">
+      <h5>Stay</h5>
+      <ul>
+        <li><a href="#">Standard Room</a></li>
+        <li><a href="#">Deluxe Room</a></li>
+        <li><a href="#">Junior Suite</a></li>
+        <li><a href="#">Presidential Suite</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h5>Experience</h5>
+      <ul>
+        <li><a href="#">Spa & Wellness</a></li>
+        <li><a href="#">Dining</a></li>
+        <li><a href="#">Rooftop Pool</a></li>
+        <li><a href="#">Azure Rewards</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h5>Contact</h5>
+      <ul>
+        <li><a href="#">+1 800 555 0199</a></li>
+        <li><a href="#">concierge@grandazure.com</a></li>
+        <li><a href="#">Book Online</a></li>
+        <li><a href="#">Chat with Us</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2026 Grand Azure Hotel. All rights reserved.</p>
+    <p>Powered by <a href="/" style="color:rgba(14,165,233,.6)">Smart Support AI</a></p>
+  </div>
+</footer>
+
+<!-- ═════════════════════════════ CHAT WIDGET ═════════════════════════ -->
+
+<!-- Floating button -->
+<button id="chat-bubble" onclick="toggleChat()">
+  <span id="chat-badge">1</span>
+  <svg class="icon-chat" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M20 2H4a2 2 0 00-2 2v18l4-4h14a2 2 0 002-2V4a2 2 0 00-2-2zm-2 10H6V10h12v2zm0-4H6V6h12v2z"/>
+  </svg>
+  <svg class="icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+  </svg>
+</button>
+
+<!-- Chat panel -->
+<div id="chat-panel">
+  <div class="cp-header">
+    <div class="cp-avatar">🏨</div>
+    <div class="cp-info">
+      <h3>Grand Azure Concierge</h3>
+      <p><span class="cp-dot"></span>Online · Typically replies instantly</p>
+    </div>
+    <button class="cp-minimize" onclick="toggleChat()">−</button>
+  </div>
+  <div class="cp-messages" id="cp-messages"></div>
+  <div id="cp-qr" class="cp-qr"></div>
+  <div class="cp-input-area">
+    <div class="cp-input-row">
+      <div class="cp-input-wrap">
+        <textarea id="cp-input" class="cp-textarea" placeholder="Ask anything about the hotel…" rows="1"
+          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();cpSend()}"
+          oninput="cpResize(this)"></textarea>
+      </div>
+      <button class="cp-send" id="cp-send-btn" onclick="cpSend()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+  <div class="cp-powered">Powered by <a href="/">Smart Support AI</a></div>
+</div>
+
+<!-- ═════════════════════════════ CHAT SCRIPT ═════════════════════════ -->
+<script>
+// ── Config ─────────────────────────────────────────────────────────────
+const SUPABASE_URL      = 'https://tuhlbdxrmtluwrxsbtct.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR1aGxiZHhybXRsdXdyeHNidGN0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMwMTU5NDUsImV4cCI6MjA4ODU5MTk0NX0.krJR766NAPYQmckHEds_zSDZ_h5KrncSvJ9bKXIfuqY';
+const COMPANY_ID        = 'b7e1f2a3-c4d5-6789-bcde-f01234567891';
+const SIMILARITY_THRESHOLD = 0.60;
+const KEYWORD_THRESHOLD    = 0.40;
+
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ── State ───────────────────────────────────────────────────────────────
+let intents     = [];
+let company     = null;
+let caps        = {};          // bot_capabilities from DB
+let history     = [];
+let cpBusy      = false;
+let chatOpen    = false;
+let initialized = false;
+let sessionId   = crypto.randomUUID();
+
+// booking wizard state
+let bookingFlow = null;  // null | { step, data:{} }
+
+// ── Booking trigger keywords ────────────────────────────────────────────
+const BOOK_TRIGGERS = ['book','reserve','reservation','i want to book','book a room','book room','make a reservation','i want to stay','book now','i want a room'];
+const CANCEL_TRIGGERS = ['cancel my booking','cancel reservation','i want to cancel','cancel my room','cancel booking'];
+const MODIFY_TRIGGERS = ['change my booking','modify reservation','change dates','update my reservation','modify booking'];
+
+// ── Navbar scroll ───────────────────────────────────────────────────────
+window.addEventListener('scroll', () => {
+  document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 40);
+});
+
+// ── Init chat data ──────────────────────────────────────────────────────
+async function initChat() {
+  if (initialized) return;
+  initialized = true;
+  const [{ data: co }, { data: iv }] = await Promise.all([
+    sb.from('companies').select('*').eq('id', COMPANY_ID).single(),
+    sb.from('intents').select('*').eq('company_id', COMPANY_ID).eq('is_active', true),
+  ]);
+  company = co;
+  intents = iv || [];
+  caps    = co?.bot_capabilities || {};
+
+  cpAppendBot(co?.welcome_message || 'Welcome to Grand Azure Hotel! 🏨 How can I assist you today?');
+  cpShowQR(['👋 What can you help with?', '🛏️ Book a Room', '💰 Room prices', '🏊 Pool & Spa', '🐾 Pet policy']);
+}
+
+// ── Toggle chat ─────────────────────────────────────────────────────────
+function toggleChat() {
+  chatOpen = !chatOpen;
+  document.getElementById('chat-bubble').classList.toggle('open', chatOpen);
+  document.getElementById('chat-panel').classList.toggle('open', chatOpen);
+  document.getElementById('chat-badge').style.display = 'none';
+  if (chatOpen) { initChat(); setTimeout(() => document.getElementById('cp-input').focus(), 350); }
+}
+
+// ── Main send handler ───────────────────────────────────────────────────
+async function cpSend() {
+  const input = document.getElementById('cp-input');
+  const text  = input.value.trim();
+  if (!text || cpBusy) return;
+  input.value = ''; cpResize(input); cpClearQR();
+  cpAppendUser(text);
+  history.push({ role: 'user', content: text });
+  cpSetBusy(true);
+
+  // ── If inside a booking wizard step, handle it ──────────────────────
+  if (bookingFlow) { await handleBookingStep(text); cpSetBusy(false); return; }
+
+  const norm = normalize(text);
+
+  // ── Booking intent ──────────────────────────────────────────────────
+  if (caps.can_book_rooms && BOOK_TRIGGERS.some(t => norm.includes(t))) {
+    await delay(300);
+    startBookingFlow(); cpSetBusy(false); return;
+  }
+
+  // ── Cancel intent ───────────────────────────────────────────────────
+  if (CANCEL_TRIGGERS.some(t => norm.includes(t))) {
+    await delay(300);
+    if (caps.can_cancel_booking) {
+      cpAppendBot('To cancel your reservation, please provide your booking reference number and I\'ll process it right away. 📋');
+    } else {
+      cpAppendBot('To cancel your booking, please contact us directly:\n\n📞 +1 800 555 0199\n📧 concierge@grandazure.com\n\nOur team will assist you within minutes! 😊');
+    }
+    cpSetBusy(false); return;
+  }
+
+  // ── Modify intent ───────────────────────────────────────────────────
+  if (MODIFY_TRIGGERS.some(t => norm.includes(t))) {
+    await delay(300);
+    if (caps.can_modify_booking) {
+      cpAppendBot('I can help you modify your booking! Please share your booking reference number and the changes you\'d like to make. 📝');
+    } else {
+      cpAppendBot('To modify your reservation, please reach out to us:\n\n📞 +1 800 555 0199\n📧 concierge@grandazure.com\n\nWe\'ll update your booking right away! 😊');
+    }
+    cpSetBusy(false); return;
+  }
+
+  // ── Pricing intent + upsell ─────────────────────────────────────────
+  const match = detectIntent(text, intents);
+  if (match) {
+    await delay(350 + Math.random() * 200);
+    let reply = match.response;
+    // Append upsell suggestion if enabled and it's a room/pricing question
+    if (caps.can_suggest_upsells && ['room_types','pricing','how_to_book'].includes(match.name)) {
+      reply += '\n\n💡 *Tip: Book the Deluxe Room this week and get a complimentary spa session!*';
+    }
+    cpAppendBot(reply);
+    history.push({ role: 'bot', content: reply });
+
+    // After pricing/room info, offer booking if enabled
+    if (caps.can_book_rooms && ['room_types','pricing','availability'].includes(match.name)) {
+      setTimeout(() => cpShowQR(['📅 Book this room', '🔍 Check availability', 'Tell me more']), 600);
+    }
+    cpSetBusy(false); return;
+  }
+
+  // ── AI fallback ──────────────────────────────────────────────────────
+  if (caps.ai_fallback_enabled !== false) {
+    cpShowTyping();
+    try {
+      const res = await sb.functions.invoke('ai-chat', {
+        body: {
+          message: text, companyId: COMPANY_ID,
+          companyName: company?.name, welcomeMessage: company?.welcome_message,
+          conversationHistory: history.slice(-6).map(m => ({ sender: m.role==='user'?'user':'bot', content: m.content })),
+        }
+      });
+      cpHideTyping();
+      const reply = res.data?.response;
+      if (reply) { cpAppendBot(reply); history.push({ role:'bot', content: reply }); }
+      else { cpAppendBot(buildHandoff()); }
+    } catch { cpHideTyping(); cpAppendBot(buildHandoff()); }
+  } else {
+    await delay(300);
+    cpAppendBot(buildHandoff());
+  }
+  cpSetBusy(false);
+}
+
+// ════════════════════════════════════════════════════════════════════════
+// BOOKING WIZARD
+// ════════════════════════════════════════════════════════════════════════
+const ROOM_TYPES = ['Standard Room ($120/night)', 'Deluxe Ocean Room ($185/night)', 'Junior Suite ($260/night)', 'Presidential Suite ($550/night)'];
+const ROOM_PRICES = { 'Standard Room': 120, 'Deluxe Ocean Room': 185, 'Junior Suite': 260, 'Presidential Suite': 550 };
+
+function startBookingFlow() {
+  bookingFlow = { step: 'room_type', data: {} };
+  cpAppendBot('I\'d love to help you book a room! 🏨 Let\'s get started.\n\nWhich room type would you like?');
+  cpShowQR(ROOM_TYPES);
+}
+
+async function handleBookingStep(text) {
+  const s = bookingFlow.step;
+  const d = bookingFlow.data;
+
+  // Allow cancel at any step
+  if (normalize(text).match(/^(cancel|stop|quit|exit|never mind|no thanks)$/)) {
+    bookingFlow = null;
+    cpAppendBot('No problem! Booking cancelled. Is there anything else I can help you with? 😊');
+    cpShowQR(['👋 What can you help with?', '💰 Room prices', '🏊 Pool & Spa']);
+    return;
+  }
+
+  await delay(300);
+
+  if (s === 'room_type') {
+    // Match room type
+    const norm = normalize(text);
+    const found = ROOM_TYPES.find(r => norm.includes(normalize(r.split(' ($')[0])));
+    if (!found) {
+      cpAppendBot('Please choose one of the available room types 👇');
+      cpShowQR(ROOM_TYPES); return;
+    }
+    d.room_type = found.split(' ($')[0];
+    bookingFlow.step = 'check_in';
+    cpAppendBot(`Great choice — **${d.room_type}**! 🛏️\n\nWhat is your check-in date? (e.g. 2026-05-15)`);
+    return;
+  }
+
+  if (s === 'check_in') {
+    const date = parseDate(text);
+    if (!date) { cpAppendBot('Please enter a valid date — for example: **2026-05-15** or **May 15**'); return; }
+    if (new Date(date) < new Date()) { cpAppendBot('Check-in date must be in the future. Please enter a valid date.'); return; }
+    d.check_in = date;
+    bookingFlow.step = 'check_out';
+    cpAppendBot(`Check-in: **${d.check_in}** ✅\n\nWhat is your check-out date?`);
+    return;
+  }
+
+  if (s === 'check_out') {
+    const date = parseDate(text);
+    if (!date) { cpAppendBot('Please enter a valid check-out date — for example: **2026-05-20**'); return; }
+    if (new Date(date) <= new Date(d.check_in)) { cpAppendBot('Check-out must be after check-in. Please enter a valid date.'); return; }
+    d.check_out = date;
+    const nights = Math.round((new Date(date) - new Date(d.check_in)) / 86400000);
+    const price  = (ROOM_PRICES[d.room_type] || 0) * nights;
+    d.nights = nights; d.total = price;
+    bookingFlow.step = 'guests';
+    cpAppendBot(`Check-out: **${d.check_out}** ✅ (${nights} night${nights>1?'s':''})\nEstimated total: **$${price.toLocaleString()}**\n\nHow many guests? (1–10)`);
+    return;
+  }
+
+  if (s === 'guests') {
+    const n = parseInt(text);
+    if (isNaN(n) || n < 1 || n > 10) { cpAppendBot('Please enter a number of guests between 1 and 10.'); return; }
+    d.num_guests = n;
+    bookingFlow.step = caps.can_collect_contact_info ? 'name' : 'confirm';
+    if (caps.can_collect_contact_info) {
+      cpAppendBot(`${n} guest${n>1?'s':''} ✅\n\nWhat is the **full name** for this reservation?`);
+    } else {
+      bookingFlow.step = 'confirm';
+      showBookingSummary();
+    }
+    return;
+  }
+
+  if (s === 'name') {
+    if (text.length < 2) { cpAppendBot('Please enter a valid full name.'); return; }
+    d.name = text;
+    bookingFlow.step = 'email';
+    cpAppendBot(`Thank you, **${text}**! 👋\n\nWhat is your **email address** so we can send the confirmation?`);
+    return;
+  }
+
+  if (s === 'email') {
+    if (!text.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) { cpAppendBot('Please enter a valid email address (e.g. john@example.com).'); return; }
+    d.email = text;
+    bookingFlow.step = 'phone';
+    cpAppendBot(`Email confirmed ✅\n\nWhat is your **phone number**? (optional — type "skip" to continue)`);
+    return;
+  }
+
+  if (s === 'phone') {
+    d.phone = normalize(text) === 'skip' ? null : text;
+    bookingFlow.step = 'special';
+    cpAppendBot('Any **special requests**? (e.g. early check-in, sea view, anniversary setup)\n\nOr type **"none"** to skip.');
+    return;
+  }
+
+  if (s === 'special') {
+    d.special = normalize(text) === 'none' ? null : text;
+    bookingFlow.step = 'confirm';
+    showBookingSummary();
+    return;
+  }
+
+  if (s === 'confirm') {
+    const norm = normalize(text);
+    if (norm.match(/^(yes|confirm|ok|sure|book it|proceed|correct|sounds good)$/)) {
+      await saveBooking();
+    } else if (norm.match(/^(no|cancel|stop)$/)) {
+      bookingFlow = null;
+      cpAppendBot('Booking cancelled. Feel free to start again anytime! 😊');
+    } else {
+      cpAppendBot('Please type **"confirm"** to complete the booking or **"cancel"** to start over.');
+      cpShowQR(['✅ Confirm booking', '❌ Cancel']);
+    }
+    return;
+  }
+}
+
+function showBookingSummary() {
+  const d = bookingFlow.data;
+  let msg = '📋 **Booking Summary**\n\n';
+  msg += `🛏️ Room: ${d.room_type}\n`;
+  msg += `📅 Check-in: ${d.check_in}\n`;
+  msg += `📅 Check-out: ${d.check_out} (${d.nights} night${d.nights>1?'s':''})\n`;
+  msg += `👥 Guests: ${d.num_guests}\n`;
+  if (d.name)    msg += `👤 Name: ${d.name}\n`;
+  if (d.email)   msg += `📧 Email: ${d.email}\n`;
+  if (d.phone)   msg += `📱 Phone: ${d.phone}\n`;
+  if (d.special) msg += `💬 Special: ${d.special}\n`;
+  msg += `\n💰 **Total: $${(d.total||0).toLocaleString()}**\n\n`;
+  msg += 'Type **"confirm"** to complete your booking or **"cancel"** to start over.';
+  cpAppendBot(msg);
+  cpShowQR(['✅ Confirm booking', '❌ Cancel']);
+}
+
+async function saveBooking() {
+  cpShowTyping();
+  const d = bookingFlow.data;
+  try {
+    await sb.from('bookings').insert({
+      company_id:       COMPANY_ID,
+      session_id:       sessionId,
+      guest_name:       d.name  || 'Guest',
+      guest_email:      d.email || 'noreply@chat.com',
+      guest_phone:      d.phone || null,
+      room_type:        d.room_type,
+      check_in_date:    d.check_in,
+      check_out_date:   d.check_out,
+      num_guests:       d.num_guests || 1,
+      special_requests: d.special || null,
+      total_price:      d.total || null,
+      status:           'pending',
+    });
+    cpHideTyping();
+    bookingFlow = null;
+    cpAppendBot(`🎉 **Booking Confirmed!**\n\nYour reservation for the **${d.room_type}** has been received! A confirmation will be sent to ${d.email||'your email'}.\n\n📌 Your booking is **pending confirmation** — our team will reach out within 2 hours.\n\nIs there anything else I can help you with?`);
+    cpShowQR(['🏊 Pool & Spa info', '🍽️ Dining options', '🚗 Airport transfer']);
+  } catch(e) {
+    cpHideTyping();
+    bookingFlow = null;
+    cpAppendBot('I\'m sorry, there was an issue saving your booking. Please try again or contact us directly:\n\n📞 +1 800 555 0199\n📧 concierge@grandazure.com');
+  }
+}
+
+function parseDate(text) {
+  // Try ISO format directly
+  if (text.match(/^\d{4}-\d{2}-\d{2}$/)) return text;
+  // Try natural formats
+  const d = new Date(text);
+  if (!isNaN(d.getTime())) {
+    const y = d.getFullYear(), m = String(d.getMonth()+1).padStart(2,'0'), day = String(d.getDate()).padStart(2,'0');
+    return `${y}-${m}-${day}`;
+  }
+  return null;
+}
+
+// ── Intent matching ─────────────────────────────────────────────────────
+function detectIntent(message, intents) {
+  const norm = normalize(message);
+  const active = intents.filter(i => i.is_active);
+  for (const i of active)
+    for (const p of (i.training_phrases||[]))
+      if (normalize(p) === norm) return i;
+
+  let bestScore = 0, best = null;
+  for (const i of active)
+    for (const p of (i.training_phrases||[])) {
+      const s = similarity(normalize(p), norm);
+      if (s > bestScore) { bestScore = s; best = i; }
+    }
+  if (bestScore >= SIMILARITY_THRESHOLD) return best;
+
+  const iw = new Set(norm.split(/\s+/));
+  bestScore = 0; best = null;
+  for (const i of active)
+    for (const p of (i.training_phrases||[])) {
+      const pw = new Set(normalize(p).split(/\s+/));
+      if (!pw.size) continue;
+      const score = [...iw].filter(w=>pw.has(w)).length / pw.size;
+      if (score > bestScore) { bestScore = score; best = i; }
+    }
+  if (bestScore >= KEYWORD_THRESHOLD) return best;
+  return null;
+}
+
+function normalize(t) { return t.toLowerCase().trim().replace(/[^\w\s]/g,'').replace(/\s+/g,' '); }
+function similarity(a,b) {
+  if (a===b) return 1; if (!a||!b) return 0;
+  return 1 - levenshtein(a,b)/Math.max(a.length,b.length);
+}
+function levenshtein(s,t) {
+  const m=s.length,n=t.length;
+  const dp=Array.from({length:m+1},(_,i)=>Array.from({length:n+1},(_,j)=>i===0?j:j===0?i:0));
+  for(let i=1;i<=m;i++) for(let j=1;j<=n;j++) dp[i][j]=Math.min(dp[i-1][j]+1,dp[i][j-1]+1,dp[i-1][j-1]+(s[i-1]===t[j-1]?0:1));
+  return dp[m][n];
+}
+
+function buildHandoff() {
+  const p = ["I'm sorry, I couldn't find the answer. Our team is here to help! 🤝"];
+  if (company?.whatsapp_number) p.push('📱 WhatsApp: '+company.whatsapp_number);
+  if (company?.support_email)   p.push('📧 Email: '+company.support_email);
+  return p.join('\n\n');
+}
+
+// ── DOM helpers ─────────────────────────────────────────────────────────
+function cpAppendUser(text) {
+  const el = cpMakeMsg('user');
+  el.querySelector('.cp-bubble').textContent = text;
+  getMsgs().appendChild(el); cpScroll();
+}
+function cpAppendBot(text) {
+  const el = cpMakeMsg('bot');
+  el.querySelector('.cp-bubble').innerHTML = esc(text).replace(/\n/g,'<br>');
+  getMsgs().appendChild(el); cpScroll();
+}
+function cpMakeMsg(role) {
+  const d = document.createElement('div');
+  d.className = `cp-msg ${role}`;
+  d.innerHTML = `<div class="cp-msg-av">${role==='bot'?'🏨':'👤'}</div><div><div class="cp-bubble"></div><div class="cp-time">${ts()}</div></div>`;
+  return d;
+}
+let typingNode = null;
+function cpShowTyping() {
+  typingNode = document.createElement('div');
+  typingNode.className='cp-msg bot'; typingNode.id='cp-typing';
+  typingNode.innerHTML='<div class="cp-msg-av">🏨</div><div class="typing-dots"><span></span><span></span><span></span></div>';
+  getMsgs().appendChild(typingNode); cpScroll();
+}
+function cpHideTyping() { document.getElementById('cp-typing')?.remove(); }
+function cpShowQR(items) {
+  const el = document.getElementById('cp-qr'); el.innerHTML='';
+  items.forEach(txt => {
+    const b = document.createElement('button');
+    b.className='cp-qr-btn'; b.textContent=txt;
+    b.onclick=()=>{ document.getElementById('cp-input').value=txt; cpSend(); };
+    el.appendChild(b);
+  });
+}
+function cpClearQR() { document.getElementById('cp-qr').innerHTML=''; }
+function cpSetBusy(b) {
+  cpBusy=b;
+  document.getElementById('cp-send-btn').disabled=b;
+  document.getElementById('cp-input').disabled=b;
+}
+function getMsgs() { return document.getElementById('cp-messages'); }
+function cpScroll() { const m=getMsgs(); m.scrollTop=m.scrollHeight; }
+function esc(t){ return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function ts(){ return new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}); }
+function delay(ms){ return new Promise(r=>setTimeout(r,ms)); }
+function cpResize(ta){ ta.style.height='auto'; ta.style.height=Math.min(ta.scrollHeight,80)+'px'; }
+</script>
+</body>
+</html>

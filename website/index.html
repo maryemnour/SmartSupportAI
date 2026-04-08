@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Support AI — Intelligent Chatbot Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#09090F;--surface:#0F0F1C;--card:#13131F;--border:#1E1E30;--border2:#2A2A40;--v:#6366F1;--v2:#4F46E5;--v3:#A5B4FC;--green:#10B981;--red:#EF4444;--amber:#F59E0B;--text:#F0EFF8;--muted:#7A7A96;--r:12px}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+h1,h2,h3{font-family:'Syne',sans-serif}
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:64px;background:rgba(9,9,15,.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.nav-logo{display:flex;align-items:center;gap:10px;font-family:'Syne',sans-serif;font-weight:700;font-size:1.05rem;color:var(--text);text-decoration:none}
+.logo-mark{width:30px;height:30px;background:var(--v);border-radius:8px;display:grid;place-items:center;font-size:.8rem}
+.nav-cta{background:var(--v);color:white;border:none;padding:8px 20px;border-radius:8px;font-family:'Syne',sans-serif;font-weight:600;font-size:.875rem;cursor:pointer;transition:all .2s}
+.nav-cta:hover{background:var(--v2)}
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:100px 24px 60px}
+.hero h1{font-size:clamp(2.4rem,5vw,4.2rem);font-weight:800;line-height:1.1;letter-spacing:-2px;margin-bottom:18px}
+.accent{background:linear-gradient(135deg,var(--v3),var(--v));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero-sub{font-size:1.05rem;color:var(--muted);max-width:500px;line-height:1.7;margin-bottom:32px}
+.hero-btns{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-bottom:56px}
+.btn-p{padding:12px 26px;border-radius:10px;font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;cursor:pointer;background:var(--v);color:white;border:none;transition:all .2s}
+.btn-p:hover{background:var(--v2);transform:translateY(-2px)}
+.btn-g{padding:12px 26px;border-radius:10px;font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;cursor:pointer;background:transparent;color:var(--muted);border:1px solid var(--border2);transition:all .2s}
+.btn-g:hover{color:var(--text);border-color:var(--muted)}
+.metrics{display:flex;gap:44px;justify-content:center}
+.metric .val{font-family:'Syne',sans-serif;font-size:1.9rem;font-weight:800}
+.metric .lbl{font-size:.8rem;color:var(--muted);margin-top:2px}
+.section{padding:90px 24px;max-width:1080px;margin:0 auto}
+.sec-tag{font-size:.75rem;font-weight:600;color:var(--v3);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px}
+.sec-title{font-size:clamp(1.7rem,3vw,2.4rem);font-weight:800;letter-spacing:-1px;margin-bottom:10px}
+.sec-sub{color:var(--muted);font-size:.95rem;max-width:480px;line-height:1.7;margin-bottom:44px}
+.feat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);border-radius:18px;overflow:hidden}
+.feat{background:var(--card);padding:24px;transition:background .2s}
+.feat:hover{background:var(--surface)}
+.feat-icon{width:42px;height:42px;background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.2);border-radius:10px;display:grid;place-items:center;font-size:1.1rem;margin-bottom:14px}
+.feat h3{font-size:.95rem;font-weight:700;margin-bottom:7px}
+.feat p{color:var(--muted);font-size:.85rem;line-height:1.6}
+.steps{max-width:620px;margin:0 auto}
+.step{display:flex;gap:18px;padding:22px 0;border-bottom:1px solid var(--border)}
+.step:last-child{border-bottom:none}
+.step-n{width:38px;height:38px;min-width:38px;background:var(--v);border-radius:50%;display:grid;place-items:center;font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem}
+.step-title{font-weight:600;margin-bottom:4px}
+.step-desc{color:var(--muted);font-size:.85rem;line-height:1.6}
+.step-code{display:inline-block;background:var(--surface);border:1px solid var(--border2);border-radius:6px;padding:5px 10px;font-family:monospace;font-size:.75rem;color:var(--green);margin-top:7px;direction:ltr}
+.price-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.plan{background:var(--card);border:1px solid var(--border2);border-radius:18px;padding:24px;transition:all .25s;position:relative}
+.plan:hover{border-color:var(--v);transform:translateY(-4px)}
+.plan.pop{border-color:var(--v)}
+.plan.pop::before{content:'Most Popular';position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:var(--v);color:white;padding:3px 12px;border-radius:100px;font-size:.7rem;font-weight:600}
+.plan-name{font-size:.72rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:7px}
+.plan-price{font-family:'Syne',sans-serif;font-size:2.2rem;font-weight:800;margin-bottom:4px}
+.plan-price span{font-size:.95rem;color:var(--muted);font-weight:400}
+.plan-period{color:var(--muted);font-size:.78rem;margin-bottom:18px}
+.plan ul{list-style:none;margin-bottom:22px}
+.plan ul li{padding:4px 0;font-size:.85rem;color:var(--muted);display:flex;align-items:center;gap:7px}
+.plan ul li::before{content:'✓';color:var(--green);font-weight:700}
+.btn-plan{width:100%;background:var(--v);color:white;border:none;padding:10px;border-radius:8px;font-family:'Syne',sans-serif;font-weight:600;font-size:.85rem;cursor:pointer;transition:all .2s}
+.btn-plan:hover{background:var(--v2)}
+.btn-plan.out{background:transparent;border:1px solid var(--border2);color:var(--muted)}
+.btn-plan.out:hover{border-color:var(--v);color:var(--text)}
+footer{border-top:1px solid var(--border);padding:28px 24px;text-align:center;color:var(--muted);font-size:.8rem}
+/* Auth overlay */
+.overlay{display:none;position:fixed;inset:0;z-index:999;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:20px}
+.overlay.open{display:flex}
+.modal{background:var(--card);border:1px solid var(--border2);border-radius:18px;padding:32px;width:100%;max-width:420px;position:relative}
+.modal-close{position:absolute;top:12px;right:12px;background:none;border:none;color:var(--muted);font-size:1.1rem;cursor:pointer;padding:4px 8px;border-radius:6px}
+.modal-close:hover{background:var(--border2);color:var(--text)}
+.modal-title{font-size:1.4rem;font-weight:800;margin-bottom:4px}
+.modal-sub{color:var(--muted);font-size:.85rem;margin-bottom:22px}
+.tabs{display:flex;background:var(--surface);border-radius:10px;padding:3px;margin-bottom:22px}
+.tab{flex:1;padding:8px;border:none;background:transparent;color:var(--muted);font-family:'Syne',sans-serif;font-weight:600;font-size:.82rem;cursor:pointer;border-radius:8px;transition:all .2s}
+.tab.on{background:var(--v);color:white}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:.78rem;color:var(--muted);margin-bottom:5px;font-weight:500}
+.field input{width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:9px;padding:10px 13px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.875rem;transition:border-color .2s;outline:none}
+.field input:focus{border-color:var(--v)}
+.field input::placeholder{color:#4A4A62}
+.btn-sub{width:100%;background:var(--v);color:white;border:none;padding:11px;border-radius:9px;font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;cursor:pointer;transition:all .2s;margin-top:4px}
+.btn-sub:hover{background:var(--v2)}
+.btn-sub:disabled{opacity:.5;cursor:not-allowed}
+.alert{margin-top:10px;padding:9px 13px;border-radius:7px;font-size:.82rem;display:none}
+.alert.ok{background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);color:#6EE7B7;display:block}
+.alert.err{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#FCA5A5;display:block}
+/* Dashboard */
+#dash{display:none}
+.dash-nav{background:var(--surface);border-bottom:1px solid var(--border);padding:0 28px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.dash-nav-logo{display:flex;align-items:center;gap:9px;font-family:'Syne',sans-serif;font-weight:700}
+.dash-body{max-width:900px;margin:32px auto;padding:0 24px}
+.dash-welcome h2{font-size:1.5rem;font-weight:800;margin-bottom:4px}
+.dash-welcome p{color:var(--muted);font-size:.875rem;margin-bottom:28px}
+.email-banner{background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.2);border-radius:var(--r);padding:13px 16px;display:flex;align-items:center;gap:11px;margin-bottom:22px}
+.email-banner p{font-size:.85rem;line-height:1.5}
+.email-banner strong{color:var(--green)}
+.cred-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:22px}
+@media(max-width:560px){.cred-grid{grid-template-columns:1fr}}
+.cred-card{background:var(--card);border:1px solid var(--border2);border-radius:var(--r);padding:16px}
+.cred-lbl{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:9px;font-weight:600}
+.cred-row{display:flex;align-items:center;gap:7px;background:var(--surface);border-radius:7px;padding:7px 11px}
+.cred-row code{flex:1;font-family:monospace;font-size:.76rem;color:var(--v3);direction:ltr;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.btn-c{background:rgba(99,102,241,.15);border:1px solid rgba(99,102,241,.2);color:var(--v3);padding:3px 9px;border-radius:6px;font-size:.73rem;cursor:pointer;white-space:nowrap;flex-shrink:0}
+.btn-c:hover{background:rgba(99,102,241,.25)}
+.embed-card{background:var(--card);border:1px solid var(--border2);border-radius:18px;overflow:hidden;margin-bottom:22px}
+.embed-head{padding:14px 18px;border-bottom:1px solid var(--border)}
+.embed-head h3{font-size:.95rem;font-weight:700}
+.embed-head p{color:var(--muted);font-size:.8rem;margin-top:2px}
+.etabs{display:flex;gap:4px;padding:10px 14px;border-bottom:1px solid var(--border);background:var(--surface)}
+.etab{padding:4px 13px;background:transparent;border:1px solid transparent;color:var(--muted);border-radius:7px;font-size:.78rem;cursor:pointer}
+.etab.on{background:rgba(99,102,241,.15);border-color:rgba(99,102,241,.3);color:var(--v3)}
+.embed-wrap{position:relative}
+.embed-code{padding:16px 18px;font-family:monospace;font-size:.78rem;color:var(--green);line-height:1.7;white-space:pre;overflow-x:auto;direction:ltr;min-height:110px}
+.embed-copy{position:absolute;top:8px;right:8px;background:var(--surface);border:1px solid var(--border2);color:var(--muted);padding:4px 11px;border-radius:7px;font-size:.73rem;cursor:pointer}
+.embed-copy:hover{color:var(--text);border-color:var(--v)}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-bottom:22px}
+@media(max-width:560px){.stats-grid{grid-template-columns:repeat(2,1fr)}}
+.sbox{background:var(--card);border:1px solid var(--border2);border-radius:var(--r);padding:14px}
+.sbox .sl{font-size:.72rem;color:var(--muted);margin-bottom:5px}
+.sbox .sv{font-family:'Syne',sans-serif;font-size:1.7rem;font-weight:800;color:var(--v3)}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--card);border:1px solid var(--border2);color:var(--text);padding:9px 18px;border-radius:100px;font-size:.82rem;box-shadow:0 8px 28px rgba(0,0,0,.4);opacity:0;transition:all .3s;z-index:9999;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<!-- LANDING ──────────────────────────────────────────────── -->
+<div id="landing">
+<nav class="nav">
+  <a href="#" class="nav-logo"><div class="logo-mark">🤖</div>Smart Support AI</a>
+  <button class="nav-cta" onclick="openAuth()">Get Started Free</button>
+</nav>
+
+<section class="hero">
+  <h1>Your AI support agent<br><span class="accent">that knows your business</span></h1>
+  <p class="hero-sub">Add an intelligent chatbot to any website or app in minutes. The AI learns from your documents and answers customers 24/7.</p>
+  <div class="hero-btns">
+    <button class="btn-p" onclick="openAuth()">Start for free</button>
+    <button class="btn-g" onclick="document.getElementById('how').scrollIntoView({behavior:'smooth'})">How it works →</button>
+  </div>
+  <div class="metrics">
+    <div class="metric"><div class="val">4</div><div class="lbl">AI stages</div></div>
+    <div class="metric"><div class="val">&lt;1s</div><div class="lbl">response time</div></div>
+    <div class="metric"><div class="val">1</div><div class="lbl">line to embed</div></div>
+  </div>
+</section>
+
+<section class="section" id="features">
+  <div class="sec-tag">Features</div>
+  <h2 class="sec-title">Everything you need to automate support</h2>
+  <p class="sec-sub">One platform. From setup to live in under 10 minutes.</p>
+  <div class="feat-grid">
+    <div class="feat"><div class="feat-icon">🧠</div><h3>Learns from your data</h3><p>Upload PDFs and docs. The AI reads them and answers customers accurately using RAG technology.</p></div>
+    <div class="feat"><div class="feat-icon">⚡</div><h3>One-line embed</h3><p>A single script tag on any website, or two lines in Flutter. Your chatbot goes live instantly.</p></div>
+    <div class="feat"><div class="feat-icon">🔒</div><h3>Multi-tenant isolation</h3><p>Every company's data is completely separated using Row Level Security.</p></div>
+    <div class="feat"><div class="feat-icon">📊</div><h3>Real-time analytics</h3><p>Track sessions, messages, resolution rates, and satisfaction scores.</p></div>
+    <div class="feat"><div class="feat-icon">🔄</div><h3>Smart human handoff</h3><p>When the bot can't answer, it escalates automatically to your team via WhatsApp or email.</p></div>
+    <div class="feat"><div class="feat-icon">📱</div><h3>Works everywhere</h3><p>Web, Flutter, Android, iOS — the same intelligent bot running across every platform.</p></div>
+  </div>
+</section>
+
+<section class="section" id="how" style="text-align:center">
+  <div class="sec-tag">How it works</div>
+  <h2 class="sec-title">From signup to live in 4 steps</h2>
+  <p class="sec-sub" style="margin:0 auto 44px">No complex setup required.</p>
+  <div class="steps">
+    <div class="step"><div class="step-n">1</div><div>
+      <div class="step-title">Create your account</div>
+      <div class="step-desc">Sign up with your company name. You'll receive your <strong>Company ID</strong> and <strong>API Key</strong> immediately — by email and in your dashboard.</div>
+    </div></div>
+    <div class="step"><div class="step-n">2</div><div>
+      <div class="step-title">Upload your knowledge base</div>
+      <div class="step-desc">Upload PDFs, text files, or FAQ docs. Our AI processes them — your bot now knows your business.</div>
+    </div></div>
+    <div class="step"><div class="step-n">3</div><div>
+      <div class="step-title">Embed in one line</div>
+      <div class="step-desc">Add the embed script to your website using the API Key, or use the Flutter SDK with your Company ID.</div>
+      <div class="step-code">&lt;script src="widget.js" data-key="YOUR_KEY"&gt;&lt;/script&gt;</div>
+    </div></div>
+    <div class="step"><div class="step-n">4</div><div>
+      <div class="step-title">Go live</div>
+      <div class="step-desc">Customers get instant, accurate answers 24/7. Monitor everything from the dashboard.</div>
+    </div></div>
+  </div>
+</section>
+
+<section class="section" id="pricing" style="text-align:center">
+  <div class="sec-tag">Pricing</div>
+  <h2 class="sec-title">Simple, transparent pricing</h2>
+  <p class="sec-sub" style="margin:0 auto 44px">Start free, scale as you grow.</p>
+  <div class="price-grid">
+    <div class="plan">
+      <div class="plan-name">Free</div><div class="plan-price">$0<span>/mo</span></div><div class="plan-period">To get started</div>
+      <ul><li>500 messages / month</li><li>1 knowledge file</li><li>Basic widget</li></ul>
+      <button class="btn-plan out" onclick="openAuth()">Get started free</button>
+    </div>
+    <div class="plan pop">
+      <div class="plan-name">Pro</div><div class="plan-price">$49<span>/mo</span></div><div class="plan-period">For growing businesses</div>
+      <ul><li>10,000 messages / month</li><li>Unlimited knowledge files</li><li>Advanced analytics</li><li>Priority support</li></ul>
+      <button class="btn-plan" onclick="openAuth()">Start free trial</button>
+    </div>
+    <div class="plan">
+      <div class="plan-name">Enterprise</div><div class="plan-price">$199<span>/mo</span></div><div class="plan-period">For scale</div>
+      <ul><li>Unlimited messages</li><li>Full REST API</li><li>White-label widget</li><li>SLA guarantee</li></ul>
+      <button class="btn-plan out" onclick="openAuth()">Contact us</button>
+    </div>
+  </div>
+</section>
+
+<footer><p>© 2026 Smart Support AI — Built with Flutter · Supabase · OpenAI</p><p style="margin-top:4px;opacity:.6">PFE Project — ISET Tunis</p></footer>
+</div>
+
+<!-- AUTH MODAL ───────────────────────────────────────────── -->
+<div class="overlay" id="auth-overlay" onclick="closeOut(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="closeAuth()">✕</button>
+    <div class="modal-title" id="modal-title">Create your account</div>
+    <div class="modal-sub" id="modal-sub">Get your Company ID and API Key instantly</div>
+    <div class="tabs"><button class="tab on" onclick="switchTab('reg')">Sign up</button><button class="tab" onclick="switchTab('login')">Log in</button></div>
+    <div id="reg-form">
+      <div class="field"><label>Company name</label><input id="rc" type="text" placeholder="e.g. Acme Corp"></div>
+      <div class="field"><label>Email address</label><input id="re" type="email" placeholder="you@company.com"></div>
+      <div class="field"><label>Password</label><input id="rp" type="password" placeholder="Minimum 8 characters"></div>
+      <button class="btn-sub" id="rb" onclick="register()">Create account &amp; get credentials</button>
+      <div class="alert" id="ra"></div>
+    </div>
+    <div id="login-form" style="display:none">
+      <div class="field"><label>Email address</label><input id="le" type="email" placeholder="you@company.com"></div>
+      <div class="field"><label>Password</label><input id="lp" type="password" placeholder="Your password"></div>
+      <button class="btn-sub" id="lb" onclick="doLogin()">Log in</button>
+      <div class="alert" id="la"></div>
+    </div>
+  </div>
+</div>
+
+<!-- DASHBOARD ────────────────────────────────────────────── -->
+<div id="dash">
+  <nav class="dash-nav">
+    <div class="dash-nav-logo"><div class="logo-mark" style="width:26px;height:26px;font-size:.65rem">🤖</div>Smart Support AI</div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <span id="dash-email" style="color:var(--muted);font-size:.82rem"></span>
+      <button onclick="doLogout()" style="background:rgba(239,68,68,.1);color:#FCA5A5;border:1px solid rgba(239,68,68,.2);padding:5px 13px;border-radius:7px;font-size:.78rem;cursor:pointer">Log out</button>
+    </div>
+  </nav>
+  <div class="dash-body">
+    <div class="dash-welcome"><h2>Welcome, <span id="dash-co"></span> 👋</h2><p>Your Smart Support AI dashboard</p></div>
+    <div class="email-banner" id="email-banner" style="display:none">
+      <span style="font-size:1.3rem">📧</span>
+      <p>We've sent your <strong>Company ID</strong> and <strong>API Key</strong> to your email. Keep them safe!</p>
+    </div>
+    <div class="cred-grid">
+      <div class="cred-card">
+        <div class="cred-lbl">🏢 Company ID</div>
+        <p style="font-size:.72rem;color:var(--muted);margin-bottom:8px">Use this in your Flutter app</p>
+        <div class="cred-row"><code id="cid">••••••••-••••-••••-••••-••••••••••••</code><button class="btn-c" onclick="toggleCid()">Show</button><button class="btn-c" onclick="copyCid()">Copy</button></div>
+      </div>
+      <div class="cred-card">
+        <div class="cred-lbl">🔑 API Key</div>
+        <p style="font-size:.72rem;color:var(--muted);margin-bottom:8px">Use this in the web widget</p>
+        <div class="cred-row"><code id="akey">sk_••••••••••••••••••••</code><button class="btn-c" onclick="toggleKey()">Show</button><button class="btn-c" onclick="copyKey()">Copy</button></div>
+        <p style="color:var(--red);font-size:.7rem;margin-top:6px">⚠️ Never share publicly</p>
+      </div>
+    </div>
+    <div class="embed-card">
+      <div class="embed-head"><h3>⚡ Embed Code</h3><p>Paste into your site or app to go live instantly</p></div>
+      <div class="etabs">
+        <button class="etab on" onclick="setEmbed('web',this)">🌐 Website</button>
+        <button class="etab" onclick="setEmbed('flutter',this)">📱 Flutter</button>
+        <button class="etab" onclick="setEmbed('react',this)">⚛️ React</button>
+      </div>
+      <div class="embed-wrap"><div class="embed-code" id="embed-code"></div><button class="embed-copy" onclick="copyEmbed()">Copy</button></div>
+    </div>
+    <div class="stats-grid">
+      <div class="sbox"><div class="sl">Sessions</div><div class="sv" id="ss">0</div></div>
+      <div class="sbox"><div class="sl">Messages</div><div class="sv" id="sm">0</div></div>
+      <div class="sbox"><div class="sl">Documents</div><div class="sv" id="sd">0</div></div>
+      <div class="sbox"><div class="sl">Intents</div><div class="sv" id="si">0</div></div>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const SUPABASE_URL      = 'https://tuhlbdxrmtluwrxsbtct.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR1aGxiZHhybXRsdXdyeHNidGN0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMwMTU5NDUsImV4cCI6MjA4ODU5MTk0NX0.krJR766NAPYQmckHEds_zSDZ_h5KrncSvJ9bKXIfuqY';
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let company = null, apiKeyFull = '', cidFull = '', cidVis = false, keyVis = false, embedType = 'web';
+
+window.addEventListener('load', async () => {
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) await loadDash(session.user, false);
+});
+
+function openAuth()  { document.getElementById('auth-overlay').classList.add('open'); }
+function closeAuth() { document.getElementById('auth-overlay').classList.remove('open'); }
+function closeOut(e) { if (e.target.id==='auth-overlay') closeAuth(); }
+
+function switchTab(t) {
+  document.querySelectorAll('.tab').forEach((b,i) => b.classList.toggle('on',(t==='reg'&&i===0)||(t==='login'&&i===1)));
+  document.getElementById('reg-form').style.display   = t==='reg'   ? 'block' : 'none';
+  document.getElementById('login-form').style.display = t==='login' ? 'block' : 'none';
+  document.getElementById('modal-title').textContent  = t==='reg' ? 'Create your account' : 'Welcome back';
+  document.getElementById('modal-sub').textContent    = t==='reg' ? 'Get your Company ID and API Key instantly' : 'Log in to your dashboard';
+}
+
+async function register() {
+  const co=document.getElementById('rc').value.trim(), em=document.getElementById('re').value.trim(), pw=document.getElementById('rp').value;
+  const btn=document.getElementById('rb'), al=document.getElementById('ra');
+  al.className='alert';
+  if (!co||!em||!pw) return showAlert(al,'err','Please fill in all fields.');
+  if (pw.length<8) return showAlert(al,'err','Password must be at least 8 characters.');
+  btn.disabled=true; btn.textContent='Creating account...';
+  const { data: auth, error: e1 } = await sb.auth.signUp({email:em, password:pw});
+  if (e1) { showAlert(al,'err',e1.message); btn.disabled=false; btn.textContent='Create account & get credentials'; return; }
+  if (!auth.session) {
+    showAlert(al,'ok','✅ Check your email and confirm your account, then log in to complete setup.');
+    btn.disabled=false; btn.textContent='Create account & get credentials'; return;
+  }
+  const apiKey='sk_'+rndKey(32);
+  const slug=co.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'')||'co-'+Date.now();
+  const { data: comp, error: e2 } = await sb.from('companies').insert({
+    name:co, slug, primary_color:'#6366F1',
+    welcome_message:`Hello! I'm ${co}'s AI assistant. How can I help?`,
+    plan:'free', api_key:apiKey, is_active:true,
+  }).select().single();
+  if (e2) { showAlert(al,'err','Error: '+e2.message); btn.disabled=false; btn.textContent='Create account & get credentials'; return; }
+  await sb.from('users').upsert({id:auth.user.id, company_id:comp.id, role:'admin', email:em}, {onConflict:'id'});
+  try { await sb.functions.invoke('send-welcome-email',{body:{to:em,companyName:co,companyId:comp.id,apiKey}}); } catch(_) {}
+  showAlert(al,'ok','✅ Account created! Check your email for your credentials.');
+  setTimeout(async()=>{const {data:{session}}=await sb.auth.getSession();if(session){closeAuth();await loadDash(session.user,true);}},2000);
+}
+
+async function doLogin() {
+  const em=document.getElementById('le').value.trim(), pw=document.getElementById('lp').value;
+  const btn=document.getElementById('lb'), al=document.getElementById('la');
+  btn.disabled=true; btn.textContent='Logging in...';
+  const {data,error}=await sb.auth.signInWithPassword({email:em,password:pw});
+  if(error){showAlert(al,'err','Invalid email or password.');btn.disabled=false;btn.textContent='Log in';return;}
+  closeAuth(); await loadDash(data.user,false);
+}
+
+async function loadDash(user, isNew) {
+  const {data:ud}=await sb.from('users').select('company_id').eq('id',user.id).single();
+  if(!ud) return;
+  const {data:co}=await sb.from('companies').select('*').eq('id',ud.company_id).single();
+  if(!co) return;
+  company=co; apiKeyFull=co.api_key||''; cidFull=co.id;
+  document.getElementById('landing').style.display='none';
+  document.getElementById('dash').style.display='block';
+  document.getElementById('dash-email').textContent=user.email;
+  document.getElementById('dash-co').textContent=co.name;
+  document.getElementById('email-banner').style.display=isNew?'flex':'none';
+  document.getElementById('cid').textContent='••••••••-••••-••••-••••-••••••••••••';
+  document.getElementById('akey').textContent='sk_••••••••••••••••••••';
+  cidVis=false; keyVis=false;
+  setEmbed('web',document.querySelector('.etab'));
+  const [{count:s},{count:m}]=await Promise.all([
+    sb.from('chat_sessions').select('*',{count:'exact',head:true}).eq('company_id',co.id),
+    sb.from('messages').select('*',{count:'exact',head:true}).eq('company_id',co.id),
+  ]);
+  const {count:d}=await sb.from('company_documents').select('*',{count:'exact',head:true}).eq('company_id',co.id);
+  const {count:i}=await sb.from('intents').select('*',{count:'exact',head:true}).eq('company_id',co.id).eq('is_active',true);
+  document.getElementById('ss').textContent=s||0;
+  document.getElementById('sm').textContent=m||0;
+  document.getElementById('sd').textContent=d||0;
+  document.getElementById('si').textContent=i||0;
+}
+
+function setEmbed(type,btn){
+  document.querySelectorAll('.etab').forEach(t=>t.classList.remove('on'));
+  if(btn) btn.classList.add('on');
+  embedType=type;
+  const k=apiKeyFull||'YOUR_API_KEY', c=cidFull||'YOUR_COMPANY_ID';
+  const codes={
+    web:`<script\n  src="https://cdn.smartsupport.ai/widget.js"\n  data-key="${k}">\n<\/script>`,
+    flutter:`SmartSupportChatbotWidget(\n  companyId: '${c}',\n)`,
+    react:`import { ChatWidget } from '@smartsupport/react';\n\n<ChatWidget apiKey="${k}" />`,
+  };
+  document.getElementById('embed-code').textContent=codes[type];
+}
+
+function toggleCid(){cidVis=!cidVis;document.getElementById('cid').textContent=cidVis?cidFull:'••••••••-••••-••••-••••-••••••••••••';document.querySelector('#cid~button').textContent=cidVis?'Hide':'Show';}
+function toggleKey(){keyVis=!keyVis;document.getElementById('akey').textContent=keyVis?apiKeyFull:'sk_••••••••••••••••••••';document.querySelectorAll('.cred-card')[1].querySelector('.btn-c').textContent=keyVis?'Hide':'Show';}
+function copyCid(){navigator.clipboard.writeText(cidFull);toast('Company ID copied ✓');}
+function copyKey(){navigator.clipboard.writeText(apiKeyFull);toast('API Key copied ✓');}
+function copyEmbed(){navigator.clipboard.writeText(document.getElementById('embed-code').textContent);toast('Embed code copied ✓');}
+
+async function doLogout(){await sb.auth.signOut();document.getElementById('dash').style.display='none';document.getElementById('landing').style.display='block';}
+
+function rndKey(n){const c='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';return Array.from(crypto.getRandomValues(new Uint8Array(n))).map(b=>c[b%c.length]).join('');}
+function showAlert(el,type,msg){el.className='alert '+type;el.textContent=msg;}
+let tt;
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),2800);}
+</script>
+</body>
+</html>
