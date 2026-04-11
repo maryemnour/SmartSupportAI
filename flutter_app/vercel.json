@@ -1,0 +1,21 @@
+{
+  "version": 2,
+  "name": "smartsupport-admin",
+  "outputDirectory": "build/web",
+  "builds": [{ "src": "build/web/**", "use": "@vercel/static" }],
+  "routes": [
+    { "src": "^/assets/(.*)", "dest": "/assets/$1" },
+    { "src": "^/(.*)\\.(.+)$", "dest": "/$1.$2" },
+    { "src": "/(.*)", "dest": "/index.html" }
+  ],
+  "headers": [
+    {
+      "source": "/assets/fonts/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+    },
+    {
+      "source": "/assets/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=86400" }]
+    }
+  ]
+}
