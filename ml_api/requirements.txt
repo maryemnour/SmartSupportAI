@@ -3,3 +3,10 @@ uvicorn>=0.29.0
 scikit-learn>=1.5.0
 numpy>=2.0.0
 pydantic>=2.7.1
+joblib>=1.4.0
+# Multilingual embeddings (FR / AR / EN) for RAG.
+# Model: paraphrase-multilingual-MiniLM-L12-v2 (~120 MB, 384-dim).
+sentence-transformers>=3.0.0
+# Pin torch CPU-only to keep the Render free-tier image small.
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch>=2.2.0

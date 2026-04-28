@@ -13,5 +13,13 @@ class AppRoutes {
   static const String sessions         = '/sessions';
   static const String documents        = '/documents';
   static const String embed            = '/embed';
-  static const String botControls     = '/bot-controls';
+  static const String botControls      = '/bot-controls';
+
+  // Super admin -- platform-wide tools, separate scaffold + sub-routes.
+  static const String superAdmin       = '/super-admin';     // legacy, redirects to superHome
+  static const String superHome        = '/super';           // landing -> superStats
+  static const String superStats       = '/super/stats';
+  static const String superCompanies   = '/super/companies';
+  static const String superUsers       = '/super/users';
+  static const String superAudit       = '/super/audit';
 }

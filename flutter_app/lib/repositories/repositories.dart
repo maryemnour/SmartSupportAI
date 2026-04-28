@@ -45,7 +45,10 @@ class IntentRepository {
 
 // ── Chat ─────────────────────────────────────────────────────
 class ChatRepository {
-  Future<ChatSession> createSession({required String companyId, required String visitorId}) async {
+  Future<ChatSession> createSession({
+    required String companyId,
+    required String visitorId,
+  }) async {
     final res = await _sb.from('chat_sessions').insert({
       'company_id': companyId, 'visitor_id': visitorId, 'status': 'active',
     }).select().single();
@@ -59,8 +62,11 @@ class ChatRepository {
   }
 
   Future<void> sendMessage({
-    required String sessionId, required String companyId,
-    required String content, required MessageSender sender, String? intentId,
+    required String sessionId,
+    required String companyId,
+    required String content,
+    required MessageSender sender,
+    String? intentId,
   }) async {
     await _sb.from('messages').insert({
       'session_id': sessionId, 'company_id': companyId,
@@ -69,28 +75,38 @@ class ChatRepository {
   }
 
   Future<void> triggerHandoff(String sessionId) async {
-    await _sb.from('chat_sessions').update({'status': 'handed_off', 'handoff_triggered': true}).eq('id', sessionId);
+    await _sb.from('chat_sessions')
+        .update({'status': 'handed_off', 'handoff_triggered': true})
+        .eq('id', sessionId);
   }
 
   Future<void> submitRating({
-    required String sessionId, required String companyId,
-    required int score, String? comment,
+    required String sessionId,
+    required String companyId,
+    required int score,
+    String? comment,
   }) async {
     await _sb.from('ratings').upsert({
-      'session_id': sessionId, 'company_id': companyId, 'score': score, 'comment': comment,
+      'session_id': sessionId, 'company_id': companyId,
+      'score': score, 'comment': comment,
     });
   }
 
   Future<List<ChatSession>> getSessions(String companyId) async {
     final res = await _sb.from('chat_sessions')
-        .select().eq('company_id', companyId).order('started_at', ascending: false).limit(50);
+        .select().eq('company_id', companyId)
+        .order('started_at', ascending: false).limit(50);
     return (res as List).map((e) => ChatSession.fromJson(e)).toList();
   }
 }
 
 // ── UnknownQuestion ──────────────────────────────────────────
 class UnknownQuestionRepository {
-  Future<void> record({required String companyId, required String question, String? sessionId}) async {
+  Future<void> record({
+    required String companyId,
+    required String question,
+    String? sessionId,
+  }) async {
     try {
       await _sb.from('unknown_questions').insert({
         'company_id': companyId, 'question': question, 'session_id': sessionId,

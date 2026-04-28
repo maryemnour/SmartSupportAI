@@ -2,11 +2,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../repositories/repositories.dart';
 import '../models/models.dart';
 
-final companyRepoProvider = Provider((_) => CompanyRepository());
-final intentRepoProvider  = Provider((_) => IntentRepository());
-final chatRepoProvider    = Provider((_) => ChatRepository());
-final uqRepoProvider      = Provider((_) => UnknownQuestionRepository());
-final analyticsRepoProvider = Provider((_) => AnalyticsRepository());
+final companyRepoProvider    = Provider((_) => CompanyRepository());
+final intentRepoProvider     = Provider((_) => IntentRepository());
+final chatRepoProvider       = Provider((_) => ChatRepository());
+final uqRepoProvider         = Provider((_) => UnknownQuestionRepository());
+final analyticsRepoProvider  = Provider((_) => AnalyticsRepository());
 
 final companyProvider = FutureProvider.family<Company?, String>((ref, id) =>
     ref.read(companyRepoProvider).getCompany(id));

@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../core/constants/app_colors.dart';
 import '../core/constants/app_routes.dart';
+import '../services/auth_service.dart';
 
 class AdminScaffold extends StatelessWidget {
   final String companyId;
@@ -13,22 +14,26 @@ class AdminScaffold extends StatelessWidget {
   final Widget? fab;
 
   const AdminScaffold({
-    super.key, required this.companyId, required this.title,
-    required this.body, required this.currentRoute,
-    this.actions, this.fab,
+    super.key,
+    required this.companyId,
+    required this.title,
+    required this.body,
+    required this.currentRoute,
+    this.actions,
+    this.fab,
   });
 
   static const _navItems = [
-    _Nav(Icons.dashboard_rounded,         'Dashboard',         AppRoutes.dashboard),
-    _Nav(Icons.psychology_rounded,        'Intents',           AppRoutes.intents),
-    _Nav(Icons.upload_file_rounded,       'Knowledge Base',    AppRoutes.documents),
-    _Nav(Icons.analytics_rounded,         'Analytics',         AppRoutes.analytics),
-    _Nav(Icons.help_outline_rounded,      'Unknown Questions', AppRoutes.unknownQuestions),
-    _Nav(Icons.forum_rounded,             'Sessions',          AppRoutes.sessions),
-    _Nav(Icons.integration_instructions_rounded, 'Embed / API Key', AppRoutes.embed),
-    _Nav(Icons.tune_rounded,              'Bot Controls',      AppRoutes.botControls),
-    _Nav(Icons.settings_rounded,          'Settings',          AppRoutes.settings),
-    _Nav(Icons.chat_rounded,              'Preview Chat',      AppRoutes.chat),
+    _Nav(Icons.dashboard_rounded,                'Dashboard',         AppRoutes.dashboard),
+    _Nav(Icons.psychology_rounded,               'Intents',           AppRoutes.intents),
+    _Nav(Icons.upload_file_rounded,              'Knowledge Base',    AppRoutes.documents),
+    _Nav(Icons.analytics_rounded,                'Analytics',         AppRoutes.analytics),
+    _Nav(Icons.help_outline_rounded,             'Unknown Questions', AppRoutes.unknownQuestions),
+    _Nav(Icons.forum_rounded,                    'Sessions',          AppRoutes.sessions),
+    _Nav(Icons.integration_instructions_rounded, 'Embed / API Key',   AppRoutes.embed),
+    _Nav(Icons.tune_rounded,                     'Bot Controls',      AppRoutes.botControls),
+    _Nav(Icons.settings_rounded,                 'Settings',          AppRoutes.settings),
+    _Nav(Icons.chat_rounded,                     'Preview Chat',      AppRoutes.chat),
   ];
 
   @override
@@ -39,6 +44,18 @@ class AdminScaffold extends StatelessWidget {
         title: Text(title),
         actions: [
           ...?actions,
+          // Super Admin button — visible only for superadmins
+          FutureBuilder<bool>(
+            future: AuthService.instance.isSuperAdmin(),
+            builder: (context, snap) {
+              if (snap.data != true) return const SizedBox.shrink();
+              return IconButton(
+                icon: const Icon(Icons.admin_panel_settings_rounded),
+                tooltip: 'Super Admin',
+                onPressed: () => context.go(AppRoutes.superAdmin),
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.logout_rounded),
             tooltip: 'Sign out',
@@ -71,7 +88,9 @@ class _Rail extends StatelessWidget {
     width: 220,
     child: ListView(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-      children: AdminScaffold._navItems.map((n) => _NavTile(nav: n, companyId: companyId, current: current)).toList(),
+      children: AdminScaffold._navItems
+          .map((n) => _NavTile(nav: n, companyId: companyId, current: current))
+          .toList(),
     ),
   );
 }
@@ -87,9 +106,11 @@ class _Drawer extends StatelessWidget {
       children: [
         const Padding(
           padding: EdgeInsets.all(16),
-          child: Text('Smart Support AI', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: AppColors.primary)),
+          child: Text('Smart Support AI',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: AppColors.primary)),
         ),
-        ...AdminScaffold._navItems.map((n) => _NavTile(nav: n, companyId: companyId, current: current)),
+        ...AdminScaffold._navItems
+            .map((n) => _NavTile(nav: n, companyId: companyId, current: current)),
       ],
     ),
   );
@@ -111,18 +132,16 @@ class _NavTile extends StatelessWidget {
       ),
       child: ListTile(
         leading: Icon(nav.icon, color: active ? AppColors.primary : AppColors.grey400, size: 20),
-        title: Text(nav.label, style: TextStyle(
-          fontSize: 13, fontWeight: active ? FontWeight.w700 : FontWeight.w500,
-          color: active ? AppColors.primary : AppColors.grey600,
-        )),
+        title: Text(nav.label,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: active ? FontWeight.w700 : FontWeight.w500,
+              color: active ? AppColors.primary : AppColors.grey600,
+            )),
         dense: true,
         onTap: () {
           if (Navigator.canPop(context)) Navigator.pop(context);
-          if (nav.route == AppRoutes.chat) {
-            context.go('${nav.route}?companyId=$companyId');
-          } else {
-            context.go('${nav.route}?companyId=$companyId');
-          }
+          context.go('${nav.route}?companyId=$companyId');
         },
       ),
     );

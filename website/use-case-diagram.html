@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>SmartSupportAI — Use Case Diagram</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', sans-serif; background: #f0f4ff; display: flex; flex-direction: column; align-items: center; padding: 30px 20px; }
+    h1 { font-size: 22px; color: #1e1b4b; margin-bottom: 6px; font-weight: 800; }
+    .subtitle { font-size: 13px; color: #6b7280; margin-bottom: 30px; }
+    .diagram { width: 100%; max-width: 1100px; background: white; border-radius: 16px; box-shadow: 0 4px 32px rgba(79,70,229,0.1); padding: 30px; }
+
+    svg { width: 100%; height: auto; }
+
+    /* Actors */
+    .actor-box { fill: #ede9fe; stroke: #7c3aed; stroke-width: 2; rx: 12; }
+    .actor-label { font-size: 13px; font-weight: 700; fill: #4c1d95; text-anchor: middle; }
+    .actor-icon { font-size: 28px; }
+
+    /* System boundary */
+    .system-rect { fill: #f8faff; stroke: #4f46e5; stroke-width: 2; stroke-dasharray: 8,4; rx: 16; }
+    .system-label { font-size: 15px; font-weight: 800; fill: #4f46e5; text-anchor: middle; }
+
+    /* Use case ellipses */
+    .uc { fill: white; stroke-width: 1.5; }
+    .uc-admin   { stroke: #4f46e5; }
+    .uc-customer{ stroke: #059669; }
+    .uc-system  { stroke: #d97706; }
+    .uc-shared  { stroke: #7c3aed; }
+
+    .uc-text { font-size: 11px; text-anchor: middle; dominant-baseline: middle; fill: #1f2937; font-weight: 600; }
+
+    /* Arrows */
+    .arrow { stroke: #9ca3af; stroke-width: 1.4; fill: none; marker-end: url(#arr); }
+    .arrow-include { stroke: #4f46e5; stroke-width: 1.2; stroke-dasharray: 5,3; fill: none; marker-end: url(#arr-blue); }
+    .arrow-extend  { stroke: #d97706; stroke-width: 1.2; stroke-dasharray: 5,3; fill: none; marker-end: url(#arr-orange); }
+
+    .rel-label { font-size: 9.5px; fill: #6b7280; text-anchor: middle; }
+
+    /* Legend */
+    .legend { display: flex; gap: 24px; flex-wrap: wrap; justify-content: center; margin-top: 18px; }
+    .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #374151; }
+    .legend-dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid; }
+  </style>
+</head>
+<body>
+  <h1>🤖 SmartSupportAI — Use Case Diagram</h1>
+  <p class="subtitle">SaaS Chatbot Platform · UML Use Case View</p>
+
+  <div class="diagram">
+    <svg viewBox="0 0 1060 720" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L8,3 z" fill="#9ca3af"/>
+        </marker>
+        <marker id="arr-blue" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L8,3 z" fill="#4f46e5"/>
+        </marker>
+        <marker id="arr-orange" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L8,3 z" fill="#d97706"/>
+        </marker>
+      </defs>
+
+      <!-- ═══════════════════ SYSTEM BOUNDARY ═══════════════════ -->
+      <rect x="180" y="30" width="720" height="660" rx="16" class="system-rect"/>
+      <text x="540" y="58" class="system-label">SmartSupportAI Platform</text>
+
+      <!-- ═══════════════════ ACTORS ═══════════════════ -->
+
+      <!-- Business Admin (left) -->
+      <ellipse cx="72" cy="200" rx="52" ry="22" class="actor-box"/>
+      <text x="72" y="204" class="actor-label">Business</text>
+      <!-- body -->
+      <circle cx="72" cy="155" r="18" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+      <text x="72" y="162" text-anchor="middle" font-size="20">🏢</text>
+      <line x1="72" y1="173" x2="72" y2="190" stroke="#7c3aed" stroke-width="2"/>
+      <text x="72" y="222" class="actor-label">Admin</text>
+
+      <!-- Customer (left-bottom) -->
+      <ellipse cx="72" cy="530" rx="52" ry="22" class="actor-box"/>
+      <circle cx="72" cy="485" r="18" fill="#d1fae5" stroke="#059669" stroke-width="2"/>
+      <text x="72" y="492" text-anchor="middle" font-size="20">👤</text>
+      <line x1="72" y1="503" x2="72" y2="520" stroke="#059669" stroke-width="2"/>
+      <text x="72" y="552" class="actor-label" fill="#065f46">Customer</text>
+
+      <!-- Claude AI (right) -->
+      <ellipse cx="988" cy="380" rx="52" ry="22" class="actor-box" fill="#fef3c7" stroke="#d97706"/>
+      <circle cx="988" cy="335" r="18" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
+      <text x="988" y="342" text-anchor="middle" font-size="20">🤖</text>
+      <line x1="988" y1="353" x2="988" y2="370" stroke="#d97706" stroke-width="2"/>
+      <text x="988" y="402" class="actor-label" fill="#92400e">Claude AI</text>
+      <text x="988" y="416" class="actor-label" fill="#92400e">(Anthropic)</text>
+
+      <!-- Supabase (right-bottom) -->
+      <ellipse cx="988" cy="560" rx="52" ry="22" class="actor-box" fill="#ecfdf5" stroke="#059669"/>
+      <circle cx="988" cy="515" r="18" fill="#ecfdf5" stroke="#059669" stroke-width="2"/>
+      <text x="988" y="522" text-anchor="middle" font-size="20">🗄️</text>
+      <line x1="988" y1="533" x2="988" y2="550" stroke="#059669" stroke-width="2"/>
+      <text x="988" y="582" class="actor-label" fill="#065f46">Supabase</text>
+      <text x="988" y="596" class="actor-label" fill="#065f46">Database</text>
+
+      <!-- ═══════════════════ ADMIN USE CASES (left column) ═══════════════════ -->
+
+      <!-- UC1: Register / Login -->
+      <ellipse cx="320" cy="100" rx="90" ry="26" class="uc uc-admin"/>
+      <text x="320" y="100" class="uc-text">Register / Login</text>
+
+      <!-- UC2: Manage Intents -->
+      <ellipse cx="320" cy="170" rx="90" ry="26" class="uc uc-admin"/>
+      <text x="320" y="170" class="uc-text">Manage Intents</text>
+      <text x="320" y="183" class="uc-text">(Train Chatbot)</text>
+
+      <!-- UC3: Configure Bot Controls -->
+      <ellipse cx="320" cy="255" rx="95" ry="26" class="uc uc-admin"/>
+      <text x="320" y="251" class="uc-text">Configure</text>
+      <text x="320" y="264" class="uc-text">Bot Controls</text>
+
+      <!-- UC4: View Analytics -->
+      <ellipse cx="320" cy="340" rx="90" ry="26" class="uc uc-admin"/>
+      <text x="320" y="336" class="uc-text">View Analytics</text>
+      <text x="320" y="349" class="uc-text">& Reports</text>
+
+      <!-- UC5: Manage Documents -->
+      <ellipse cx="320" cy="415" rx="90" ry="26" class="uc uc-admin"/>
+      <text x="320" y="411" class="uc-text">Upload</text>
+      <text x="320" y="424" class="uc-text">Documents</text>
+
+      <!-- UC6: Get Embed Code -->
+      <ellipse cx="320" cy="490" rx="90" ry="26" class="uc uc-admin"/>
+      <text x="320" y="486" class="uc-text">Get Embed</text>
+      <text x="320" y="499" class="uc-text">Code</text>
+
+      <!-- UC7: Review Unknown Qs -->
+      <ellipse cx="320" cy="565" rx="90" ry="26" class="uc uc-admin"/>
+      <text x="320" y="561" class="uc-text">Review Unknown</text>
+      <text x="320" y="574" class="uc-text">Questions</text>
+
+      <!-- UC8: Manage Bookings -->
+      <ellipse cx="320" cy="640" rx="90" ry="26" class="uc uc-admin"/>
+      <text x="320" y="636" class="uc-text">Manage</text>
+      <text x="320" y="649" class="uc-text">Bookings</text>
+
+      <!-- ═══════════════════ CUSTOMER USE CASES (center) ═══════════════════ -->
+
+      <!-- UC9: Open Chat Widget -->
+      <ellipse cx="570" cy="460" rx="95" ry="26" class="uc uc-customer"/>
+      <text x="570" y="456" class="uc-text">Open Chat</text>
+      <text x="570" y="469" class="uc-text">Widget</text>
+
+      <!-- UC10: Ask Question -->
+      <ellipse cx="570" cy="530" rx="95" ry="26" class="uc uc-customer"/>
+      <text x="570" y="526" class="uc-text">Ask Question /</text>
+      <text x="570" y="539" class="uc-text">Get Answer</text>
+
+      <!-- UC11: Book Service -->
+      <ellipse cx="570" cy="600" rx="95" ry="26" class="uc uc-customer"/>
+      <text x="570" y="596" class="uc-text">Book a Service</text>
+      <text x="570" y="609" class="uc-text">(Room / Appt.)</text>
+
+      <!-- UC12: Submit Complaint -->
+      <ellipse cx="570" cy="670" rx="95" ry="26" class="uc uc-customer"/>
+      <text x="570" y="666" class="uc-text">Submit</text>
+      <text x="570" y="679" class="uc-text">Complaint</text>
+
+      <!-- ═══════════════════ SYSTEM USE CASES (center-top) ═══════════════════ -->
+
+      <!-- UC13: Classify Intent (ML) -->
+      <ellipse cx="570" cy="100" rx="100" ry="26" class="uc uc-system"/>
+      <text x="570" y="96" class="uc-text">Classify Intent</text>
+      <text x="570" y="109" class="uc-text">(ML API)</text>
+
+      <!-- UC14: AI Fallback -->
+      <ellipse cx="570" cy="175" rx="100" ry="26" class="uc uc-system"/>
+      <text x="570" y="171" class="uc-text">AI Fallback</text>
+      <text x="570" y="184" class="uc-text">(Claude API)</text>
+
+      <!-- UC15: Send Email -->
+      <ellipse cx="570" cy="255" rx="100" ry="26" class="uc uc-system"/>
+      <text x="570" y="251" class="uc-text">Send Email</text>
+      <text x="570" y="264" class="uc-text">Notification</text>
+
+      <!-- UC16: Check Capability -->
+      <ellipse cx="570" cy="340" rx="100" ry="26" class="uc uc-system"/>
+      <text x="570" y="336" class="uc-text">Check Bot</text>
+      <text x="570" y="349" class="uc-text">Capabilities</text>
+
+      <!-- ═══════════════════ ARROWS: Admin → Use Cases ═══════════════════ -->
+      <line x1="124" y1="190" x2="228" y2="106" class="arrow"/>
+      <line x1="124" y1="195" x2="228" y2="172" class="arrow"/>
+      <line x1="124" y1="200" x2="223" y2="252" class="arrow"/>
+      <line x1="124" y1="205" x2="228" y2="338" class="arrow"/>
+      <line x1="124" y1="208" x2="228" y2="413" class="arrow"/>
+      <line x1="124" y1="210" x2="228" y2="488" class="arrow"/>
+      <line x1="124" y1="212" x2="228" y2="563" class="arrow"/>
+      <line x1="124" y1="215" x2="228" y2="638" class="arrow"/>
+
+      <!-- ═══════════════════ ARROWS: Customer → Use Cases ═══════════════════ -->
+      <line x1="124" y1="518" x2="473" y2="463" class="arrow" stroke="#059669"/>
+      <line x1="124" y1="525" x2="473" y2="528" class="arrow" stroke="#059669"/>
+      <line x1="124" y1="532" x2="473" y2="598" class="arrow" stroke="#059669"/>
+      <line x1="124" y1="538" x2="473" y2="668" class="arrow" stroke="#059669"/>
+
+      <!-- ═══════════════════ INCLUDE arrows ═══════════════════ -->
+      <!-- Ask Question --include--> Classify Intent -->
+      <line x1="570" y1="504" x2="570" y2="368" class="arrow-include"/>
+      <text x="592" y="442" class="rel-label">«include»</text>
+
+      <!-- Classify Intent --include--> AI Fallback -->
+      <line x1="570" y1="126" x2="570" y2="149" class="arrow-include"/>
+      <text x="592" y="140" class="rel-label">«extend»</text>
+
+      <!-- Check Bot Capabilities -->
+      <line x1="570" y1="504" x2="570" y2="366" class="arrow-include"/>
+
+      <!-- Ask Question --include--> Check Capability -->
+      <line x1="522" y1="516" x2="522" y2="356" class="arrow-include"/>
+      <text x="500" y="438" class="rel-label">«include»</text>
+
+      <!-- Book Service --include--> Check Capability -->
+      <line x1="510" y1="585" x2="510" y2="356" class="arrow-include"/>
+
+      <!-- Register --include--> Send Email -->
+      <line x1="412" y1="100" x2="468" y2="251" class="arrow-include"/>
+      <text x="460" y="170" class="rel-label">«include»</text>
+
+      <!-- ═══════════════════ ARROWS: System UCs → External Actors ═══════════════════ -->
+      <!-- AI Fallback → Claude AI -->
+      <line x1="672" y1="175" x2="934" y2="370" class="arrow" stroke="#d97706"/>
+      <text x="800" y="260" class="rel-label" fill="#d97706">calls API</text>
+
+      <!-- Use Cases → Supabase -->
+      <line x1="672" y1="340" x2="934" y2="542" class="arrow" stroke="#059669"/>
+      <text x="810" y="430" class="rel-label" fill="#059669">read/write</text>
+
+      <line x1="414" y1="640" x2="934" y2="558" class="arrow" stroke="#059669"/>
+
+      <!-- ═══════════════════ SECTION LABELS ═══════════════════ -->
+      <rect x="190" y="68" width="180" height="610" rx="8" fill="#eff6ff" fill-opacity="0.4" stroke="#bfdbfe" stroke-width="1"/>
+      <text x="280" y="88" font-size="11" fill="#3b82f6" text-anchor="middle" font-weight="700">ADMIN ACTIONS</text>
+
+      <rect x="465" y="68" width="220" height="295" rx="8" fill="#fffbeb" fill-opacity="0.5" stroke="#fde68a" stroke-width="1"/>
+      <text x="575" y="88" font-size="11" fill="#d97706" text-anchor="middle" font-weight="700">SYSTEM PROCESSES</text>
+
+      <rect x="465" y="438" width="220" height="255" rx="8" fill="#ecfdf5" fill-opacity="0.5" stroke="#a7f3d0" stroke-width="1"/>
+      <text x="575" y="456" font-size="11" fill="#059669" text-anchor="middle" font-weight="700">CUSTOMER ACTIONS</text>
+
+    </svg>
+
+    <!-- Legend -->
+    <div class="legend">
+      <div class="legend-item">
+        <div class="legend-dot" style="background:#eff6ff; border-color:#4f46e5"></div>
+        Admin Use Cases
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background:#fffbeb; border-color:#d97706"></div>
+        System Processes
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background:#ecfdf5; border-color:#059669"></div>
+        Customer Use Cases
+      </div>
+      <div class="legend-item">
+        <div style="width:28px; height:2px; border-top: 2px dashed #4f46e5; margin-right:4px"></div>
+        «include» / «extend»
+      </div>
+      <div class="legend-item">
+        <div style="width:28px; height:2px; background:#9ca3af; margin-right:4px"></div>
+        Association
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:fl_chart/fl_chart.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_routes.dart';
 import '../../widgets/admin_scaffold.dart';
@@ -13,91 +12,130 @@ class DashboardScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final analyticsAsync = ref.watch(analyticsProvider(companyId));
-    final companyAsync   = ref.watch(companyProvider(companyId));
-    final company = companyAsync.value;
+    final analytics = ref.watch(analyticsProvider(companyId));
 
     return AdminScaffold(
-      companyId: companyId, currentRoute: AppRoutes.dashboard, title: 'Dashboard',
-      body: analyticsAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Error: $e')),
-        data: (analytics) => ListView(
-          padding: const EdgeInsets.all(20),
-          children: [
-            Text('Welcome back${company != null ? ', ${company.name}' : ''} 👋',
-              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: AppColors.grey900)),
-            const SizedBox(height: 4),
-            const Text('Here\'s what\'s happening with your chatbot.', style: TextStyle(color: AppColors.grey400)),
-            const SizedBox(height: 24),
-            // KPI cards
-            GridView.count(
-              crossAxisCount: MediaQuery.of(context).size.width > 600 ? 4 : 2,
-              shrinkWrap: true, physics: const NeverScrollableScrollPhysics(),
-              crossAxisSpacing: 12, mainAxisSpacing: 12, childAspectRatio: 1.4,
+      companyId: companyId,
+      title: 'Dashboard',
+      currentRoute: AppRoutes.dashboard,
+      body: analytics.when(
+        data: (data) {
+          return SingleChildScrollView(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _KpiCard('Total Sessions', '${analytics?.totalSessions ?? 0}', Icons.forum_rounded, AppColors.primary),
-                _KpiCard('Total Messages', '${analytics?.totalMessages ?? 0}', Icons.chat_bubble_rounded, const Color(0xFF8B5CF6)),
-                _KpiCard('Avg Satisfaction', analytics?.avgSatisfaction != null && analytics!.avgSatisfaction > 0 ? '${analytics.avgSatisfaction}/5' : '—', Icons.star_rounded, const Color(0xFFF59E0B)),
-                _KpiCard('Human Handoffs', '${analytics?.handoffCount ?? 0}', Icons.transfer_within_a_station_rounded, const Color(0xFFEF4444)),
+                Text('Overview', style: Theme.of(context).textTheme.headlineSmall),
+                const SizedBox(height: 24),
+                
+                // KPI Cards
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final crossAxisCount = constraints.maxWidth > 900 ? 4 : 2;
+                    return GridView.count(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      crossAxisCount: crossAxisCount,
+                      mainAxisSpacing: 16,
+                      crossAxisSpacing: 16,
+                      childAspectRatio: 1.8,
+                      children: [
+                        _KpiCard('Total Sessions', '${data?.totalSessions ?? 0}', Icons.chat_bubble_outline, AppColors.primary),
+                        _KpiCard('Total Messages', '${data?.totalMessages ?? 0}', Icons.message_outlined, AppColors.success),
+                        _KpiCard('Avg Satisfaction', (data?.avgSatisfaction ?? 0).toStringAsFixed(1), Icons.star_outline, AppColors.warning),
+                        _KpiCard('Active Intents', '${data?.activeIntents ?? 0}', Icons.psychology_outlined, AppColors.primary),
+                      ],
+                    );
+                  },
+                ),
+                
+                const SizedBox(height: 32),
+                
+                // Quick Actions
+                const Text('Quick Actions', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                const SizedBox(height: 16),
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
+                  children: [
+                    _ActionButton(Icons.add, 'Add Intent', () => context.go('${AppRoutes.intents}?companyId=$companyId')),
+                    _ActionButton(Icons.settings, 'Settings', () => context.go('${AppRoutes.settings}?companyId=$companyId')),
+                    _ActionButton(Icons.analytics, 'Analytics', () => context.go('${AppRoutes.analytics}?companyId=$companyId')),
+                    _ActionButton(Icons.help_outline, 'Unknown Questions', () => context.go('${AppRoutes.unknownQuestions}?companyId=$companyId')),
+                  ],
+                ),
               ],
             ),
-            const SizedBox(height: 24),
-            // Quick actions
-            const Text('Quick Actions', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.grey900)),
-            const SizedBox(height: 12),
-            Wrap(spacing: 10, runSpacing: 10, children: [
-              _ActionBtn('Manage Intents', Icons.psychology_rounded, () => context.go('${AppRoutes.intents}?companyId=$companyId')),
-              _ActionBtn('Upload Documents', Icons.upload_file_rounded, () => context.go('${AppRoutes.documents}?companyId=$companyId')),
-              _ActionBtn('View Analytics', Icons.analytics_rounded, () => context.go('${AppRoutes.analytics}?companyId=$companyId')),
-              _ActionBtn('Unknown Questions', Icons.help_outline_rounded, () => context.go('${AppRoutes.unknownQuestions}?companyId=$companyId')),
-              _ActionBtn('Embed Code', Icons.integration_instructions_rounded, () => context.go('${AppRoutes.embed}?companyId=$companyId')),
-            ]),
-          ],
-        ),
+          );
+        },
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (e, st) => Center(child: Text('Error: $e')),
       ),
     );
   }
 }
 
 class _KpiCard extends StatelessWidget {
-  final String label, value;
+  final String title;
+  final String value;
   final IconData icon;
   final Color color;
-  const _KpiCard(this.label, this.value, this.icon, this.color);
+  const _KpiCard(this.title, this.value, this.icon, this.color);
+
   @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.all(14),
-    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12),
-      border: Border.all(color: AppColors.grey200)),
-    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Row(children: [
-        Container(width: 32, height: 32, decoration: BoxDecoration(color: color.withOpacity(.1), borderRadius: BorderRadius.circular(8)),
-          child: Icon(icon, color: color, size: 18)),
-        const Spacer(),
-      ]),
-      const SizedBox(height: 8),
-      Text(value, style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: color)),
-      Text(label, style: const TextStyle(fontSize: 11, color: AppColors.grey400)),
-    ]),
-  );
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.grey200),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(child: Text(title, style: const TextStyle(fontSize: 12, color: AppColors.grey600))),
+              Icon(icon, color: color, size: 18),
+            ],
+          ),
+          Text(value, style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700, color: color)),
+        ],
+      ),
+    );
+  }
 }
 
-class _ActionBtn extends StatelessWidget {
-  final String label;
+class _ActionButton extends StatelessWidget {
   final IconData icon;
+  final String label;
   final VoidCallback onTap;
-  const _ActionBtn(this.label, this.icon, this.onTap);
+  const _ActionButton(this.icon, this.label, this.onTap);
+
   @override
-  Widget build(BuildContext context) => OutlinedButton.icon(
-    icon: Icon(icon, size: 16),
-    label: Text(label, style: const TextStyle(fontSize: 13)),
-    style: OutlinedButton.styleFrom(
-      foregroundColor: AppColors.primary,
-      side: const BorderSide(color: AppColors.primary),
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-    ),
-    onPressed: onTap,
-  );
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+        decoration: BoxDecoration(
+          color: AppColors.primaryLight,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: AppColors.primary),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 18, color: AppColors.primary),
+            const SizedBox(width: 8),
+            Text(label, style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.w600)),
+          ],
+        ),
+      ),
+    );
+  }
 }

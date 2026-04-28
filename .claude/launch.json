@@ -1,0 +1,26 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "Website",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "3000"],
+      "cwd": "website",
+      "port": 3000
+    },
+    {
+      "name": "ML API",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"],
+      "cwd": "ml_api",
+      "port": 8000
+    },
+    {
+      "name": "Flutter App (Web)",
+      "runtimeExecutable": "flutter",
+      "runtimeArgs": ["run", "-d", "web-server", "--web-port", "4000", "--web-hostname", "0.0.0.0"],
+      "cwd": "flutter_app",
+      "port": 4000
+    }
+  ]
+}
