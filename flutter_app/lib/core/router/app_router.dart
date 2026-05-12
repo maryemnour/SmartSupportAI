@@ -40,6 +40,12 @@ final routerProvider = Provider<GoRouter>((ref) {
         AppRoutes.onboarding,
         AppRoutes.chat,
       ];
+
+      // Redirect away from login/register if already authenticated
+      if (isAuth && (path == AppRoutes.login || path == AppRoutes.register)) {
+        return AppRoutes.splash;
+      }
+
       if (publicRoutes.contains(path)) return null;
 
       // Require authentication

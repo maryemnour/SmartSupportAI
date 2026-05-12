@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_routes.dart';
 import '../../services/auth_service.dart';
@@ -53,8 +54,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       } else {
         context.go(AppRoutes.onboarding);
       }
+    } on AuthException catch (e) {
+      setState(() {
+        _loading = false;
+        if (e.message.toLowerCase().contains('email not confirmed')) {
+          _error = 'Please confirm your email before signing in.';
+        } else {
+          _error = 'Invalid email or password.';
+        }
+      });
     } catch (e) {
-      setState(() { _loading = false; _error = 'Invalid email or password.'; });
+      setState(() { _loading = false; _error = 'An unexpected error occurred.'; });
     }
   }
 

@@ -60,7 +60,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         'id': user.id,
         'company_id': compId,
         'role': 'admin',
-        'email': user.email,
+        'email': user.email?.toLowerCase(),
       });
 
       // Send welcome email

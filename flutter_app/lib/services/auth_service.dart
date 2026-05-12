@@ -27,7 +27,7 @@ class AuthService {
       if (id != null && id.isNotEmpty) return id;
 
       // Step 2: race condition fix — search by email
-      final email = user.email;
+      final email = user.email?.toLowerCase();
       if (email == null) return null;
       final found = await _sb.client
           .from('users').select('company_id')
