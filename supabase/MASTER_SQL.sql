@@ -143,7 +143,7 @@ RETURNS TRIGGER LANGUAGE plpgsql AS $$ BEGIN NEW.updated_at = now(); RETURN NEW;
 
 CREATE OR REPLACE FUNCTION handle_new_auth_user()
 RETURNS TRIGGER LANGUAGE plpgsql SECURITY DEFINER AS $$
-BEGIN INSERT INTO public.users (id, email, role) VALUES (NEW.id, NEW.email, 'admin') ON CONFLICT (id) DO NOTHING; RETURN NEW; END;
+BEGIN INSERT INTO public.users (id, email, role) VALUES (NEW.id, LOWER(NEW.email), 'admin') ON CONFLICT (id) DO NOTHING; RETURN NEW; END;
 $$;
 
 CREATE OR REPLACE FUNCTION search_company_docs(p_company_id UUID, p_embedding vector(1536), p_limit INT DEFAULT 5)
